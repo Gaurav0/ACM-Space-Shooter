@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ACM Space Shooter</title>
+        <link rel="stylesheet" type="text/css" href="spaceshooter.css">
+    </head>
+    <body>
+        <canvas id="field" width="600" height="600"></canvas>
+        <div id="score">0</div>
+        <div id="pause">Paused<div id="resume">Press ESC to resume</div></div>
+        <audio id="boom" preload="auto">
+            <source src="audio/explosion.mp3" type="audio/mp3">
+            <source src="audio/explosion.ogg" type="audio/ogg">
+        </audio>
+        <audio id="launch" preload="auto">
+            <source src="audio/launch.mp3" type="audio/mp3">
+            <source src="audio/launch.ogg" type="audio/ogg">
+        </audio>
+        <audio id="loop" preload="auto" loop="loop">
+            <source src="audio/through_space.mp3" type="audio/mp3">
+            <source src="audio/through_space.ogg" type="audio/ogg">
+        </audio>
+        <script type="text/javascript" src="spaceshooter.js"></script>
+    </body>
+</html>
