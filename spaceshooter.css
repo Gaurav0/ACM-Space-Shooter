@@ -15,6 +15,10 @@
     font: 22px arial, sans-serif;
 }
 
+#start {
+    display: none;
+}
+
 #pause {
     position: absolute;
     top: 240px;

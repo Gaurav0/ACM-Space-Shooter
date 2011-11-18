@@ -77,6 +77,18 @@ window.addEventListener("DOMContentLoaded", function() {
             this.drawOver();
         };
         
+		this.setPos = function(dx, dy) {
+            this.clear();
+            this.drawUnder();
+            this.x = dx;
+            this.y = dy;
+            
+            if (this.onSetPos(dx, dy)) {
+                this.draw();
+                this.drawOver();
+            }
+        };
+        
         var _collide = this.collide;
         this.collide = function(object2) {
             return !this.dead && _collide.call(this, object2);
@@ -241,6 +253,16 @@ window.addEventListener("DOMContentLoaded", function() {
             return true;
         };
         
+		
+		this.onSetPos = function(dx,dy){
+          if (!this.inbounds()) {
+                this.x = dx;
+                this.y = dy;
+            }
+            return true;
+        };
+		
+        
         this.inbounds = function() {
             return this.x >= 0 && this.x + this.w <= c.width &&
                    this.y >= 0 && this.y + this.h <= c.height;
@@ -268,6 +290,7 @@ window.addEventListener("DOMContentLoaded", function() {
         this.explode = function() {
             window.removeEventListener("keydown", keyDownHandler, false);
             window.removeEventListener("keydown", keyUpHandler, false);
+            window.removeEventListener("click", mouseClick, false);
             key_status = {};
             loop.pause();
             this.remove();
@@ -636,6 +659,7 @@ window.addEventListener("DOMContentLoaded", function() {
         posY = (posY + BACKGROUND_SPEED) % BACKGROUND_HEIGHT;
         c.style.backgroundPosition = "0px " + posY + "px";
     }
+	// Modified by me to scroll side ways.
     document.addEventListener("timer", moveBackground, false);
             
     var keys = {
@@ -702,5 +726,28 @@ window.addEventListener("DOMContentLoaded", function() {
     window.addEventListener("keyup", keyUpHandler, false);
     window.addEventListener("keydown", pauseHandler, false);
     window.addEventListener("timer", keyHandler, false);
+	
+	window.addEventListener("click", mouseClick, false);
+    
+    function mouseClick(event){
+		window.addEventListener("timer", moveStarShip, false);
+		player.targetX = event.pageX;
+    }
+
+	function moveStarShip(){
+		
+		if (player.x == player.targetX) {
+			removeEventListener("timer", moveStarShip, false);
+			var torpedo = player.shoot();
+			torpedoList.push(torpedo);
+		} else {
+			if (player.x < player.targetX - 2*MOVEMENT_RATE)
+				player.move(2*MOVEMENT_RATE, 0);
+			else if (player.x > player.targetX + 2*MOVEMENT_RATE)
+				player.move(-2*MOVEMENT_RATE, 0);
+			else
+				player.setPos(player.targetX, player.y);
+		}
+	}
 
 }, false);
