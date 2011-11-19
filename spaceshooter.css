@@ -47,3 +47,9 @@
     margin-top: 8px;
     margin-left: -10px;
 }
+
+#mouse_ctrl {
+    position: absolute;
+    top: 650px;
+    left: 15px;
+}

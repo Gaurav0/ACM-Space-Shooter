@@ -77,18 +77,6 @@ window.addEventListener("DOMContentLoaded", function() {
             this.drawOver();
         };
         
-		this.setPos = function(dx, dy) {
-            this.clear();
-            this.drawUnder();
-            this.x = dx;
-            this.y = dy;
-            
-            if (this.onSetPos(dx, dy)) {
-                this.draw();
-                this.drawOver();
-            }
-        };
-        
         var _collide = this.collide;
         this.collide = function(object2) {
             return !this.dead && _collide.call(this, object2);
@@ -103,6 +91,7 @@ window.addEventListener("DOMContentLoaded", function() {
         };
         
         this.explode = function() {
+            this.clear();
             this.remove();
         };
     }
@@ -251,17 +240,7 @@ window.addEventListener("DOMContentLoaded", function() {
                 this.y -= dy;
             }
             return true;
-        };
-        
-		
-		this.onSetPos = function(dx,dy){
-          if (!this.inbounds()) {
-                this.x = dx;
-                this.y = dy;
-            }
-            return true;
-        };
-		
+        };        
         
         this.inbounds = function() {
             return this.x >= 0 && this.x + this.w <= c.width &&
@@ -290,11 +269,36 @@ window.addEventListener("DOMContentLoaded", function() {
         this.explode = function() {
             window.removeEventListener("keydown", keyDownHandler, false);
             window.removeEventListener("keydown", keyUpHandler, false);
-            window.removeEventListener("click", mouseClick, false);
-            key_status = {};
+            removeMouseListeners();
+            document.removeEventListener("timer", moveStarshipToTargetX, false);
+            mouseDown = false;
+            keyStatus = {};
             loop.pause();
             this.remove();
             new Explosion(this);
+        };
+        
+        var starship = this;
+        var moveStarshipToTargetX = function() {
+            starship.moveToTargetX();
+        };
+        
+        this.moveToTargetX = function() {
+            if (this.x == this.targetX) {
+                document.removeEventListener("timer", moveStarshipToTargetX, false);
+            } else {
+                if (this.x < this.targetX - MOVEMENT_RATE)
+                    this.move(MOVEMENT_RATE, 0);
+                else if (this.x > this.targetX + MOVEMENT_RATE)
+                    this.move(-MOVEMENT_RATE, 0);
+                else
+                    this.move(this.targetX - this.x, 0);
+            }
+        };
+        
+        this.setTargetX = function(targetX) {
+            this.targetX = targetX;
+            document.addEventListener("timer", moveStarshipToTargetX, false);
         };
     }
     
@@ -344,11 +348,6 @@ window.addEventListener("DOMContentLoaded", function() {
             return this.y < -this.h;
         }
         
-        this.explode = function() {
-            this.remove();
-            this.clear();
-        };
-        
         Torpedo.playSound();
     }
     
@@ -391,16 +390,11 @@ window.addEventListener("DOMContentLoaded", function() {
                 return !this.dead;
             }
             
-            return true;
+            return !this.dead;
         };
         
         this.outOfBounds = function() {
             return this.y > c.height;
-        }
-        
-        this.explode = function() {
-            this.remove();
-            this.clear();
         };
         
         Torpedo.playSound();
@@ -432,116 +426,116 @@ window.addEventListener("DOMContentLoaded", function() {
     }
     
     Enemy1.WIDTH = 50;
-	Enemy1.HEIGHT = 50;
+    Enemy1.HEIGHT = 50;
     Enemy1.SPEED = 5;
-	Enemy1.GENERATION_RATE = 1/6;
-	Enemy1.HP = 100;
-	Enemy1.DAMAGE = 20;
-	Enemy1.POINTS = 10;
-	Enemy1.img = new Image();
-	Enemy1.img.src = "images/enemy1.png";
-	
-	function Enemy1() {
-		Enemy.call(this, {
+    Enemy1.GENERATION_RATE = 1/6;
+    Enemy1.HP = 100;
+    Enemy1.DAMAGE = 20;
+    Enemy1.POINTS = 10;
+    Enemy1.img = new Image();
+    Enemy1.img.src = "images/enemy1.png";
+    
+    function Enemy1() {
+        Enemy.call(this, {
             y: -Enemy1.HEIGHT,
-			w: Enemy1.WIDTH,
+            w: Enemy1.WIDTH,
             h: Enemy1.HEIGHT,
             z: 3,
             hp: Enemy1.HP,
             img: Enemy1.img,
             dy: Enemy1.SPEED
         });
-			
-		this.x = Math.floor(Math.random() * (c.width - this.w));
+            
+        this.x = Math.floor(Math.random() * (c.width - this.w));
         this.dx = (Math.floor(Math.random() * 2) - 0.5) * 4 *
                   (Math.floor(Math.random() * 2) + 1);
-		
+        
         var _onMove = this.onMove;
-		this.onMove = function(dx, dy) {
-			if (!((this.x + dx) >= 0 && (this.x + this.w + dx) <= c.width)) {
-				this.dx *= -1;
-			}
+        this.onMove = function(dx, dy) {
+            if (!((this.x + dx) >= 0 && (this.x + this.w + dx) <= c.width)) {
+                this.dx *= -1;
+            }
             return _onMove.call(this, dx, dy);
-		}
-	}
+        }
+    }
     
     Enemy2.WIDTH = 54;
-	Enemy2.HEIGHT = 56;
+    Enemy2.HEIGHT = 56;
     Enemy2.SPEED = 5;
-	Enemy2.GENERATION_RATE = 1/6;
-	Enemy2.HP = 100;
-	Enemy2.DAMAGE = 20;
-	Enemy2.POINTS = 10;
-	Enemy2.img = new Image();
-	Enemy2.img.src = "images/enemy2.png";
+    Enemy2.GENERATION_RATE = 1/6;
+    Enemy2.HP = 100;
+    Enemy2.DAMAGE = 20;
+    Enemy2.POINTS = 10;
+    Enemy2.img = new Image();
+    Enemy2.img.src = "images/enemy2.png";
     
     function Enemy2(){
-		Enemy.call(this, {
+        Enemy.call(this, {
             y: -Enemy2.HEIGHT,
-			w: Enemy2.WIDTH,
+            w: Enemy2.WIDTH,
             h: Enemy2.HEIGHT,
             z: 4,
             hp: Enemy2.HP,
             img: Enemy2.img,
             dy: Enemy2.SPEED
         });
-			
-		this.x = Math.floor(Math.random() * (c.width - this.w));
+            
+        this.x = Math.floor(Math.random() * (c.width - this.w));
         this.dx = (Math.floor(Math.random() * 2) - 0.5) * 4 *
                   (Math.floor(Math.random() * 2) + 1);
-		
+        
         var _onMove = this.onMove;
-		this.onMove = function(dx, dy) {
-			if (!((this.x + dx) >= 0 && (this.x + this.w + dx) <= c.width)) {
-				this.dx *= -1;
-			}
+        this.onMove = function(dx, dy) {
+            if (!((this.x + dx) >= 0 && (this.x + this.w + dx) <= c.width)) {
+                this.dx *= -1;
+            }
             return _onMove.call(this, dx, dy);
-		}
-	}
+        }
+    }
     
     EnemyShip.WIDTH = 48;
-	EnemyShip.HEIGHT = 48;
+    EnemyShip.HEIGHT = 48;
     EnemyShip.SPEED = 3;
-	EnemyShip.GENERATION_RATE = 1/5;
-	EnemyShip.HP = 100;
-	EnemyShip.DAMAGE = 20;
-	EnemyShip.POINTS = 100;
+    EnemyShip.GENERATION_RATE = 1/5;
+    EnemyShip.HP = 100;
+    EnemyShip.DAMAGE = 20;
+    EnemyShip.POINTS = 100;
     EnemyShip.FIRE_DELAY = 8;
-	EnemyShip.MAX_NUM = 3;
-	EnemyShip.img = new Image();
-	EnemyShip.img.src = "images/starshipdark.png";
+    EnemyShip.MAX_NUM = 3;
+    EnemyShip.img = new Image();
+    EnemyShip.img.src = "images/starshipdark.png";
     
     EnemyShip.numAlive = 0;
-	
-	function EnemyShip() {
-		Enemy.call(this, {
+    
+    function EnemyShip() {
+        Enemy.call(this, {
             y: -EnemyShip.HEIGHT,
-			w: EnemyShip.WIDTH,
+            w: EnemyShip.WIDTH,
             h: EnemyShip.HEIGHT,
             z: 2,
             hp: EnemyShip.HP,
             img: EnemyShip.img,
             dy: EnemyShip.SPEED
         });
-			
-		this.x = Math.floor(Math.random() * (c.width - this.w));
+            
+        this.x = Math.floor(Math.random() * (c.width - this.w));
         this.dx = (Math.floor(Math.random() * 2) - 0.5) * 4 *
                   (Math.floor(Math.random() * 2) + 1);
         this.canFire = true;
         this.midway = Math.floor(Math.random() * 7) * 50 + 50;
         EnemyShip.numAlive++;
-		
+        
         var _onMove = this.onMove;
-		this.onMove = function(dx, dy) {
+        this.onMove = function(dx, dy) {
             if (this.y >= this.midway)
                 this.dy = 0;
             if (!player.dead && Math.abs(this.x - player.x) < 10)
                 this.shoot();
-			if (!((this.x + dx) >= 0 && (this.x + this.w + dx) <= c.width)) {
-				this.dx *= -1;
-			}
+            if (!((this.x + dx) >= 0 && (this.x + this.w + dx) <= c.width)) {
+                this.dx *= -1;
+            }
             return _onMove.call(this, dx, dy);
-		}
+        }
         
         this.shoot = function() {
             var counter = EnemyShip.FIRE_DELAY;
@@ -567,7 +561,7 @@ window.addEventListener("DOMContentLoaded", function() {
             _remove.call(this);
             EnemyShip.numAlive--;
         };
-	}
+    }
     
     function SpriteList() {
         this.sprites = [];
@@ -643,10 +637,10 @@ window.addEventListener("DOMContentLoaded", function() {
         
         var timer = this;
         this.dispatch = function() {
-            timer.last = Date.now();
-            document.dispatchEvent(timer.evt);
-            timer.elapsed = Date.now() - timer.last;
             if (!this.paused) {
+                timer.last = Date.now();
+                document.dispatchEvent(timer.evt);
+                timer.elapsed = Date.now() - timer.last;
                 timer.targetId = window.setTimeout(function() {
                     timer.dispatch();
                 }, 1000/Timer.FPS - timer.elapsed);
@@ -657,7 +651,7 @@ window.addEventListener("DOMContentLoaded", function() {
     }
     
     var gameTimer = new Timer();
-	var spriteList = new SpriteList();
+    var spriteList = new SpriteList();
     var player = new Starship();
     var gameScore = new Score();
     
@@ -665,21 +659,22 @@ window.addEventListener("DOMContentLoaded", function() {
         player.draw();
         loop.play();
     }, false);
-	
+    
     var ticks = 1;
-	function generateEnemies() {
+    function generateEnemies() {
         ticks++;
         if (ticks % (Timer.FPS / Asteroid.GENERATION_RATE) == 0)
             new Asteroid();
         if (ticks % (Timer.FPS / Enemy1.GENERATION_RATE) == 0)
             new Enemy1();
-        if (ticks % (Timer.FPS / Enemy2.GENERATION_RATE) == Timer.FPS / Enemy2.GENERATION_RATE / 2)
+        if (ticks % (Timer.FPS / Enemy2.GENERATION_RATE) ==
+                Timer.FPS / Enemy2.GENERATION_RATE / 2)
             new Enemy2();
         if (ticks % (Timer.FPS / EnemyShip.GENERATION_RATE) == 0 &&
                 EnemyShip.numAlive < EnemyShip.MAX_NUM)
             new EnemyShip();
-	}
-	window.addEventListener("timer", generateEnemies, false);
+    }
+    document.addEventListener("timer", generateEnemies, false);
     
     var loop = document.getElementById("loop");
     // Fix for Firefox not looping audio:
@@ -697,7 +692,6 @@ window.addEventListener("DOMContentLoaded", function() {
         posY = (posY + BACKGROUND_SPEED) % BACKGROUND_HEIGHT;
         c.style.backgroundPosition = "0px " + posY + "px";
     }
-	// Modified by me to scroll side ways.
     document.addEventListener("timer", moveBackground, false);
             
     var keys = {
@@ -709,13 +703,13 @@ window.addEventListener("DOMContentLoaded", function() {
         ENTER: 13
     };
     
-    var key_status = {};
+    var keyStatus = {};
     
     function keyDownHandler(event) {
         var keycode = event.keyCode;
         for (var key in keys)
             if (keys[key] == keycode) {
-                key_status[keycode] = true;
+                keyStatus[keycode] = true;
                 event.preventDefault();
             }
     }
@@ -724,27 +718,27 @@ window.addEventListener("DOMContentLoaded", function() {
         var keycode = event.keyCode;
         for (var key in keys)
             if (keys[key] == keycode) {
-                key_status[keycode] = false;
+                keyStatus[keycode] = false;
             }
     }
     
     function keyHandler(event) {
                 
-        if (key_status[keys.LEFT]) {
+        if (keyStatus[keys.LEFT]) {
             player.move(-MOVEMENT_RATE, 0);
         }
-        else if (key_status[keys.RIGHT]) {
+        else if (keyStatus[keys.RIGHT]) {
             player.move(MOVEMENT_RATE, 0);
         }
         
-        if (key_status[keys.UP]) {
+        if (keyStatus[keys.UP]) {
             player.move(0, -MOVEMENT_RATE);
         }
-        else if (key_status[keys.DOWN]) {
+        else if (keyStatus[keys.DOWN]) {
             player.move(0, MOVEMENT_RATE);
         }
         
-        if (key_status[keys.SPACE] || key_status[keys.ENTER]) {
+        if (keyStatus[keys.SPACE] || keyStatus[keys.ENTER] || mouseDown) {
             player.shoot();
         }
     }
@@ -763,29 +757,49 @@ window.addEventListener("DOMContentLoaded", function() {
     window.addEventListener("keydown", keyDownHandler, false);    
     window.addEventListener("keyup", keyUpHandler, false);
     window.addEventListener("keydown", pauseHandler, false);
-    window.addEventListener("timer", keyHandler, false);
-	
-	window.addEventListener("click", mouseClick, false);
+    document.addEventListener("timer", keyHandler, false);
     
-    function mouseClick(event){
-		window.addEventListener("timer", moveStarShip, false);
-		player.targetX = event.pageX;
+    var mouseDown = false;
+    var mouseEn = document.getElementById("mouse_en");
+    var mouseEnabled = mouseEn.checked;
+    
+    function mouseDownHandler(event) {
+        mouseDown = true;
     }
-
-	function moveStarShip(){
-		
-		if (player.x == player.targetX) {
-			removeEventListener("timer", moveStarShip, false);
-			var torpedo = player.shoot();
-			torpedoList.push(torpedo);
-		} else {
-			if (player.x < player.targetX - 2*MOVEMENT_RATE)
-				player.move(2*MOVEMENT_RATE, 0);
-			else if (player.x > player.targetX + 2*MOVEMENT_RATE)
-				player.move(-2*MOVEMENT_RATE, 0);
-			else
-				player.setPos(player.targetX, player.y);
-		}
-	}
+    
+    function mouseMoveHandler(event) {
+        player.setTargetX(event.pageX);
+    }
+    
+    function mouseUpHandler(event) {
+        mouseDown = false;
+    }
+    
+    function addMouseListeners() {
+        window.addEventListener("mousedown", mouseDownHandler, false);
+        window.addEventListener("mousemove", mouseMoveHandler, false);
+        window.addEventListener("mouseup", mouseUpHandler, false);
+    }
+    
+    function removeMouseListeners() {
+        window.removeEventListener("mousedown", mouseDownHandler, false);
+        window.removeEventListener("mousemove", mouseMoveHandler, false);
+        window.removeEventListener("mouseup", mouseUpHandler, false);
+    }
+    
+    if (mouseEnabled)
+        addMouseListeners();
+    
+    mouseEn.addEventListener("click", function() {
+    
+        if (mouseEn.checked) {
+            mouseEnabled = true;
+            addMouseListeners();
+        } else {
+            mouseEnabled = false;
+            removeMouseListeners();
+        }
+    
+    }, false);
 
 }, false);
