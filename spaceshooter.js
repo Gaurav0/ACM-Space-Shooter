@@ -400,15 +400,17 @@ window.addEventListener("DOMContentLoaded", function() {
         Torpedo.playSound();
     }
     
-    Asteroid.WIDTH = 92;
-    Asteroid.HEIGHT = 87;
+    Asteroid.WIDTH = 109;
+    Asteroid.HEIGHT = 91;
     Asteroid.SPEED = 4;
     Asteroid.GENERATION_RATE = 1 / 4;
+    Asteroid.ROTATION_RATE = 1 / 3;
     Asteroid.HP = 1000;
     Asteroid.DAMAGE = 1000;
     Asteroid.POINTS = 1;
+    Asteroid.NUM_FRAMES = 30;
     Asteroid.img = new Image();
-    Asteroid.img.src = "images/asteroid.png";
+    Asteroid.img.src = "images/asteroid-big.png";
     
     function Asteroid() {
         Enemy.call(this, {
@@ -423,6 +425,20 @@ window.addEventListener("DOMContentLoaded", function() {
         });
     
         this.x = Math.floor(Math.random() * (c.width - this.w));
+        this.frame = Math.floor(Math.random() * Asteroid.NUM_FRAMES);
+        this.ticks = 0;
+        
+        this.draw = function() {
+            ctx.drawImage(this.img, 0, this.frame * Asteroid.HEIGHT, this.w, this.h,
+                this.x, this.y, this.w, this.h);
+        };
+        
+        var _onMove = this.onMove;
+        this.onMove = function(dx, dy) {
+            if (this.ticks++ % (1 / Asteroid.ROTATION_RATE) == 0)
+                this.frame = (this.frame + 1) % Asteroid.NUM_FRAMES;
+            return _onMove.call(this, dx, dy);
+        }
     }
     
     Enemy1.WIDTH = 50;
