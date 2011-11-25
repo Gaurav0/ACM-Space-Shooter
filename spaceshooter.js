@@ -266,6 +266,14 @@ window.addEventListener("DOMContentLoaded", function() {
             }
         };
         
+        var _damage = this.damage;
+        this.damage = function(dmg) {
+            _damage.call(this, dmg);
+            if (this.hp < 0)
+                this.hp = 0;
+            document.getElementById("health").style.width = (this.hp / Starship.HP) * 100 + "%";
+        }
+        
         this.explode = function() {
             window.removeEventListener("keydown", keyDownHandler, false);
             window.removeEventListener("keydown", keyUpHandler, false);
