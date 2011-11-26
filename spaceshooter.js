@@ -425,7 +425,7 @@ window.addEventListener("DOMContentLoaded", function() {
             y: -Asteroid.HEIGHT,
             w: Asteroid.WIDTH, 
             h: Asteroid.HEIGHT,
-            z: 6,
+            z: 7,
             hp: Asteroid.HP, 
             img: Asteroid.img,
             dx: 0,
@@ -464,7 +464,7 @@ window.addEventListener("DOMContentLoaded", function() {
             y: -Enemy1.HEIGHT,
             w: Enemy1.WIDTH,
             h: Enemy1.HEIGHT,
-            z: 3,
+            z: 4,
             hp: Enemy1.HP,
             img: Enemy1.img,
             dy: Enemy1.SPEED
@@ -498,7 +498,7 @@ window.addEventListener("DOMContentLoaded", function() {
             y: -Enemy2.HEIGHT,
             w: Enemy2.WIDTH,
             h: Enemy2.HEIGHT,
-            z: 4,
+            z: 5,
             hp: Enemy2.HP,
             img: Enemy2.img,
             dy: Enemy2.SPEED
@@ -585,6 +585,58 @@ window.addEventListener("DOMContentLoaded", function() {
             _remove.call(this);
             EnemyShip.numAlive--;
         };
+    }
+    
+    EnemyUFO.WIDTH = 48;
+    EnemyUFO.HEIGHT = 48;
+    EnemyUFO.SPEED = 2;
+    EnemyUFO.GENERATION_RATE = 1/5;
+    EnemyUFO.ROTATION_RATE = 6;
+    EnemyUFO.HP = 100;
+    EnemyUFO.DAMAGE = 20;
+    EnemyUFO.POINTS = 10;
+    EnemyUFO.img = new Image();
+    EnemyUFO.img.src = "images/ufodark.png";
+    
+    function EnemyUFO() {
+        Enemy.call(this, {
+            y: -EnemyUFO.HEIGHT,
+            w: EnemyUFO.WIDTH,
+            h: EnemyUFO.HEIGHT,
+            z: 3,
+            hp: EnemyUFO.HP,
+            img: EnemyUFO.img,
+            dx: 0,
+            dy: EnemyUFO.SPEED
+        });
+        
+        this.x = Math.floor(Math.random() * (c.width - this.w - 400)) + 200;
+        this.radius = Math.floor(Math.random() * 200) + 100;
+        this.degrees = Math.floor(Math.random() * 360);
+        this.dir = (Math.floor(Math.random() * 2) - 0.5) * 2;
+        console.log(this.dir);
+        
+        this.draw = function() {
+            ctx.drawImage(this.img, Math.round(this.x), Math.round(this.y));
+        }
+        
+        this.clear = function() {
+            ctx.clearRect(Math.round(this.x), Math.round(this.y), this.w, this.h);
+        };
+        
+        this.outOfBounds = function() {
+            return (this.y - 2 * this.radius > c.height);
+        };
+        
+        var _onMove = this.onMove;
+        this.onMove = function(dx, dy) {
+            this.degrees = (this.degrees + this.dir * EnemyUFO.ROTATION_RATE) % 360;
+            var radians = Math.PI * this.degrees / 180;
+            var multiplier = this.radius / Timer.FPS;
+            this.dx = multiplier * (-Math.sin(radians));
+            this.dy = multiplier * (Math.cos(radians)) + EnemyUFO.SPEED;
+            return _onMove.call(this, dx, dy);
+        }
     }
     
     function SpriteList() {
@@ -689,6 +741,8 @@ window.addEventListener("DOMContentLoaded", function() {
         ticks++;
         if (ticks % (Timer.FPS / Asteroid.GENERATION_RATE) == 0)
             new Asteroid();
+        if (ticks % (Timer.FPS / EnemyUFO.GENERATION_RATE) == 0)
+            new EnemyUFO();
         if (ticks % (Timer.FPS / Enemy1.GENERATION_RATE) == 0)
             new Enemy1();
         if (ticks % (Timer.FPS / Enemy2.GENERATION_RATE) ==
