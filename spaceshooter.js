@@ -192,7 +192,7 @@ window.addEventListener("DOMContentLoaded", function() {
                 this.clear();
                 this.drawUnder();
             } else
-                Explosion.playSound();
+                playSound(Explosion.sound);
             if (this.frame < Explosion.FRAMES) {
                 this.draw();
                 this.drawOver();
@@ -204,12 +204,6 @@ window.addEventListener("DOMContentLoaded", function() {
             }
         };
     }
-    
-    Explosion.playSound = function() {
-        Explosion.sound.pause();
-        Explosion.sound.currentTime = 0;
-        Explosion.sound.play();
-    };
     
     Starship.WIDTH = 48;
     Starship.HEIGHT = 48;
@@ -356,14 +350,8 @@ window.addEventListener("DOMContentLoaded", function() {
             return this.y < -this.h;
         }
         
-        Torpedo.playSound();
+        playSound(Torpedo.sound);
     }
-    
-    Torpedo.playSound = function() {
-        Torpedo.sound.pause();
-        Torpedo.sound.currentTime = 0;
-        Torpedo.sound.play();
-    };
     
     EnemyTorpedo.WIDTH = 12;
     EnemyTorpedo.HEIGHT = 41;
@@ -405,7 +393,7 @@ window.addEventListener("DOMContentLoaded", function() {
             return this.y > c.height;
         };
         
-        Torpedo.playSound();
+        playSound(Torpedo.sound);
     }
     
     Asteroid.WIDTH = 109;
@@ -614,7 +602,6 @@ window.addEventListener("DOMContentLoaded", function() {
         this.radius = Math.floor(Math.random() * 200) + 100;
         this.degrees = Math.floor(Math.random() * 360);
         this.dir = (Math.floor(Math.random() * 2) - 0.5) * 2;
-        console.log(this.dir);
         
         this.draw = function() {
             ctx.drawImage(this.img, Math.round(this.x), Math.round(this.y));
@@ -731,11 +718,6 @@ window.addEventListener("DOMContentLoaded", function() {
     var player = new Starship();
     var gameScore = new Score();
     
-    window.addEventListener("load", function() {
-        player.draw();
-        loop.play();
-    }, false);
-    
     var ticks = 1;
     function generateEnemies() {
         ticks++;
@@ -763,6 +745,19 @@ window.addEventListener("DOMContentLoaded", function() {
         }, false);
     }
     loop.volume = LOOP_VOLUME;
+    
+    window.addEventListener("load", function() {
+        player.draw();
+        loop.play();
+    }, false);
+    
+    function playSound(sound) {
+        if (sound.currentTime != 0) {
+            sound.pause();
+            sound.currentTime = 0;
+        }
+        sound.play();
+    };
     
     var posY = 0;
     
