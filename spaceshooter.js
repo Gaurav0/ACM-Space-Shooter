@@ -396,6 +396,52 @@ window.addEventListener("DOMContentLoaded", function() {
         playSound(Torpedo.sound);
     }
     
+    Fireball.WIDTH = 20;
+    Fireball.HEIGHT = 61;
+    Fireball.SPEED = 10;
+    Fireball.HP = 1;
+    Fireball.DAMAGE = 20;
+    Fireball.img = new Image();
+    Fireball.img.src = "images/fireball3.png";
+    
+    function Fireball(enemy) {
+        AutoPilotedSprite.call(this, {
+            w: Fireball.WIDTH, 
+            h: Fireball.HEIGHT,
+            z: 1,
+            hp: Fireball.HP, 
+            img: Fireball.img,
+            dx: 0,
+            dy: Fireball.SPEED
+        });
+        
+        this.x = enemy.x + (enemy.w - this.w) / 2;
+        this.y = enemy.y + enemy.h;
+        this.frame = Math.floor(Math.random() * Fireball.NUM_FRAMES);
+        this.ticks = 0;
+        
+        
+        var _onMove = this.onMove;
+        this.onMove = function(dx, dy) {
+            if (!_onMove.call(this, dx, dy))
+                return false;
+                
+            if (player.collide(this)) {
+                player.damage(this.constructor.DAMAGE);
+                this.damage(Starship.DAMAGE);
+                return !this.dead;
+            }
+                      
+            return !this.dead;
+        };
+        
+        this.outOfBounds = function() {
+            return this.y > c.height;
+        };
+        
+        playSound(Torpedo.sound);
+    }
+    
     Asteroid.WIDTH = 109;
     Asteroid.HEIGHT = 91;
     Asteroid.SPEED = 4;
@@ -626,6 +672,83 @@ window.addEventListener("DOMContentLoaded", function() {
         }
     }
     
+    Boss1.WIDTH = 132;
+    Boss1.HEIGHT = 144;
+    Boss1.SPEED = 5;
+    //Boss1.GENERATION_RATE = 1/6;
+    Boss1.HP = 10000;
+    Boss1.DAMAGE = 100;
+    Boss1.POINTS = 1000;
+    Boss1.img = new Image();
+    Boss1.img.src = "images/boss1.png";
+    Boss1.spawned = false;
+    Boss1.FIRE_DELAY = 1;
+    
+    function Boss1() {
+        Enemy.call(this, {
+            y: -Boss1.HEIGHT,
+            w: Boss1.WIDTH,
+            h: Boss1.HEIGHT,
+            z: 4,
+            hp: Boss1.HP,
+            img: Boss1.img,
+            dy: Boss1.SPEED
+        });
+        
+        this.x = c.width/2 - this.w/2;
+        this.dx = 0;
+        this.canFire = true;
+        
+        //this.x = Math.floor(Math.random() * (c.width - this.w));
+        //this.dx = (Math.floor(Math.random() * 2) - 0.5) * 4 *
+        //          (Math.floor(Math.random() * 2) + 1);
+        
+        this.shoot = function() {
+            var counter = Boss1.FIRE_DELAY;
+            var Boss1l = this;
+            
+            var fireDelay = function() {
+                counter--;
+                if (counter == 0) {
+                    Boss1l.canFire = true;
+                    document.removeEventListener("timer", fireDelay, false);
+                }
+            };
+            
+            if (this.canFire) {
+                this.canFire = false;
+                document.addEventListener("timer", fireDelay, false);
+                new Fireball(this);
+            }
+        };
+        
+        var _onMove = this.onMove;
+        this.onMove = function(dx, dy) {
+            if (this.y > c.height/3)
+            {
+                if (this.dx == 0)
+                    this.dx = Boss1.SPEED;
+                //this.dx = Boss1.SPEED;
+                this.dy = 0;
+                /*if (this.x + this.w > c.width)
+                    this.dx = Boss1.speed*-1;
+                else if (this.x < 0)
+                    this.dx = Boss1.speed;
+                else
+                    this.dx = Boss1.speed;*/
+                if (!((this.x + dx) >= 0 && (this.x + this.w + dx) <= c.width)) {
+                    //this.dx = this.dx * -1 * Boss1.SPEED;
+                    this.dx *= -1;
+                }
+            }
+            if (!player.dead && Math.abs(this.x + this.w/2 - player.x) < 20)
+                this.shoot();
+            return _onMove.call(this, dx, dy);
+        }
+        
+        
+    }
+    
     function SpriteList() {
         this.sprites = [];
         
@@ -720,19 +843,34 @@ window.addEventListener("DOMContentLoaded", function() {
     
     var ticks = 1;
     function generateEnemies() {
-        ticks++;
-        if (ticks % (Timer.FPS / Asteroid.GENERATION_RATE) == 0)
-            new Asteroid();
-        if (ticks % (Timer.FPS / EnemyUFO.GENERATION_RATE) == 0)
-            new EnemyUFO();
-        if (ticks % (Timer.FPS / Enemy1.GENERATION_RATE) == 0)
-            new Enemy1();
-        if (ticks % (Timer.FPS / Enemy2.GENERATION_RATE) ==
-                Timer.FPS / Enemy2.GENERATION_RATE / 2)
-            new Enemy2();
-        if (ticks % (Timer.FPS / EnemyShip.GENERATION_RATE) == 0 &&
-                EnemyShip.numAlive < EnemyShip.MAX_NUM)
-            new EnemyShip();
+        if (gameScore.points >= 2000 && gameScore.points < 3000) {
+            console.log(spriteList.sprites);
+            if (spriteList.sprites.length == 1)
+            {
+                if (!Boss1.spawned)
+                {
+                    console.log(Boss1.spawned);
+                    new Boss1();
+                    Boss1.spawned = true;
+                    //console.log(Boss1.spawned);
+                }
+            }
+        }
+        else {
+            ticks++;
+            if (ticks % (Timer.FPS / Asteroid.GENERATION_RATE) == 0)
+                new Asteroid();
+            if (ticks % (Timer.FPS / EnemyUFO.GENERATION_RATE) == 0)
+                new EnemyUFO();
+            if (ticks % (Timer.FPS / Enemy1.GENERATION_RATE) == 0)
+                new Enemy1();
+            if (ticks % (Timer.FPS / Enemy2.GENERATION_RATE) ==
+                    Timer.FPS / Enemy2.GENERATION_RATE / 2)
+                new Enemy2();
+            if (ticks % (Timer.FPS / EnemyShip.GENERATION_RATE) == 0 &&
+                    EnemyShip.numAlive < EnemyShip.MAX_NUM)
+                new EnemyShip();
+        }
     }
     document.addEventListener("timer", generateEnemies, false);
     
