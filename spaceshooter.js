@@ -7,6 +7,9 @@ window.addEventListener("DOMContentLoaded", function() {
     var BACKGROUND_HEIGHT = 1092;
     var MOVEMENT_RATE = 15;
     var KEY_ESC = 27;
+    var MAX_LIVES = 3;
+    var LIFE_DELAY = 60;
+    var INVULNERABLE_PERIOD = 60;
     
     function Sprite(args) {
         
@@ -214,6 +217,7 @@ window.addEventListener("DOMContentLoaded", function() {
     Starship.FIRE_DELAY = 8;
     Starship.img = new Image();
     Starship.img.src = "images/starship.png";
+    Starship.num_lives = MAX_LIVES;
         
     function Starship() {
         LivingSprite.call(this, {
@@ -227,6 +231,34 @@ window.addEventListener("DOMContentLoaded", function() {
         });
         
         this.canFire = true;
+        document.getElementById("health").style.width = "100%";
+        Starship.num_lives--;
+        
+        this.invulnerable_time_left = INVULNERABLE_PERIOD;
+        this.invulnerable = true;
+        var starship = this;
+        var countdown = function() {
+            if (starship.invulnerable_time_left-- == 0) {
+                starship.invulnerable = false;
+                starship.draw();
+                document.removeEventListener("timer", countdown, false);
+            }
+        }
+        document.addEventListener("timer", countdown, false);
+        
+        window.addEventListener("keydown", keyDownHandler, false);    
+        window.addEventListener("keyup", keyUpHandler, false);
+        document.addEventListener("timer", keyHandler, false);
+        if (mouseEnabled)
+            addMouseListeners();
+        
+        var _draw = this.draw;
+        this.draw = function() {
+            if (this.invulnerable)
+                ctx.globalAlpha = 0.05;
+            _draw.call(this);
+            ctx.globalAlpha = 1;
+        };
         
         this.onMove = function(dx, dy) {
             if (!this.inbounds()) {
@@ -262,15 +294,18 @@ window.addEventListener("DOMContentLoaded", function() {
         
         var _damage = this.damage;
         this.damage = function(dmg) {
-            _damage.call(this, dmg);
-            if (this.hp < 0)
-                this.hp = 0;
-            document.getElementById("health").style.width = (this.hp / Starship.HP) * 100 + "%";
+            if (!this.invulnerable) {
+                _damage.call(this, dmg);
+                if (this.hp < 0)
+                    this.hp = 0;
+                document.getElementById("health").style.width = (this.hp / Starship.HP) * 100 + "%";
+            }
         }
         
         this.explode = function() {
             window.removeEventListener("keydown", keyDownHandler, false);
             window.removeEventListener("keydown", keyUpHandler, false);
+            document.removeEventListener("timer", keyHandler, false);
             removeMouseListeners();
             document.removeEventListener("timer", moveStarshipToTargetX, false);
             mouseDown = false;
@@ -278,9 +313,16 @@ window.addEventListener("DOMContentLoaded", function() {
             loop.pause();
             this.remove();
             new Explosion(this);
+            document.getElementById("life" + Starship.num_lives).style.display = "none";
+            if (Starship.num_lives > 0) {
+                delay = LIFE_DELAY;
+                document.addEventListener("timer", nextLife, false);
+            } else {
+                window.removeEventListener("keydown", pauseHandler, false);
+                document.getElementById("end").style.visibility = "visible";
+            }
         };
         
-        var starship = this;
         var moveStarshipToTargetX = function() {
             starship.moveToTargetX();
         };
@@ -715,7 +757,7 @@ window.addEventListener("DOMContentLoaded", function() {
     
     var gameTimer = new Timer();
     var spriteList = new SpriteList();
-    var player = new Starship();
+    var player;
     var gameScore = new Score();
     
     var ticks = 1;
@@ -747,9 +789,21 @@ window.addEventListener("DOMContentLoaded", function() {
     loop.volume = LOOP_VOLUME;
     
     window.addEventListener("load", function() {
+        player = new Starship();
         player.draw();
         loop.play();
     }, false);
+        
+    var delay = LIFE_DELAY;
+    var nextLife = function() {
+        delay--;
+        if (delay == 0) {
+            document.removeEventListener("timer", nextLife, false);
+            player = new Starship();
+            player.draw();
+            loop.play();
+        }
+    }
     
     function playSound(sound) {
         if (sound.currentTime != 0) {
@@ -827,11 +881,7 @@ window.addEventListener("DOMContentLoaded", function() {
         }
     }
     
-    window.addEventListener("keydown", keyDownHandler, false);    
-    window.addEventListener("keyup", keyUpHandler, false);
     window.addEventListener("keydown", pauseHandler, false);
-    document.addEventListener("timer", keyHandler, false);
-    
     var mouseDown = false;
     var mouseEn = document.getElementById("mouse_en");
     var mouseEnabled = mouseEn.checked;
@@ -859,9 +909,6 @@ window.addEventListener("DOMContentLoaded", function() {
         window.removeEventListener("mousemove", mouseMoveHandler, false);
         window.removeEventListener("mouseup", mouseUpHandler, false);
     }
-    
-    if (mouseEnabled)
-        addMouseListeners();
     
     mouseEn.addEventListener("click", function() {
     

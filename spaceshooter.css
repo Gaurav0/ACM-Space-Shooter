@@ -22,6 +22,17 @@
     background-color: red;
 }
 
+#lives {
+    position: absolute;
+    top: 12px;
+    left: 125px;
+    -webkit-transform: scale(0.5);
+    -moz-transform: scale(0.5);
+    -o-transform: scale(0.5);
+    -ms-transform: scale(0.5);
+    transform: scale(0.5);
+}
+
 #score {
     position: absolute;
     top: 25px;
@@ -42,6 +53,27 @@
     left: 105px;
     width: 400px;
     height: 100px;
+    font: 50px bold arial, sans-serif;
+    text-align: center;
+    padding-top: 12px;
+    padding-left: 20px;
+    color: #ffff00;
+    letter-spacing: 20px;
+    text-transform: uppercase;
+    visibility: hidden;
+    border-style: solid;
+    border-width: 3px;
+    border-color: #ffff00;
+    border-radius: 30px;
+    background-color: rgba(0, 0, 255, 0.25);
+}
+
+#end {
+    position: absolute;
+    top: 240px;
+    left: 135px;
+    width: 340px;
+    height: 130px;
     font: 50px bold arial, sans-serif;
     text-align: center;
     padding-top: 12px;
