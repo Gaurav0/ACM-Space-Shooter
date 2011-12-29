@@ -4,7 +4,7 @@ window.addEventListener("DOMContentLoaded", function() {
     var ctx = c.getContext("2d");
     var LOOP_VOLUME = 0.2;
     var BACKGROUND_SPEED = 2;
-    var BACKGROUND_HEIGHT = 1092;
+    var BACKGROUND_HEIGHT = 1200;
     var MOVEMENT_RATE = 15;
     var KEY_ESC = 27;
     var MAX_LIVES = 3;
@@ -492,7 +492,7 @@ window.addEventListener("DOMContentLoaded", function() {
     Asteroid.HP = 1000;
     Asteroid.DAMAGE = 1000;
     Asteroid.POINTS = 1;
-    Asteroid.NUM_FRAMES = 30;
+    Asteroid.NUM_FRAMES = 29;
     Asteroid.img = new Image();
     Asteroid.img.src = "images/asteroid-big.png";
     
