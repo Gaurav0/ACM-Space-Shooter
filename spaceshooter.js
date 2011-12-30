@@ -445,6 +445,8 @@ window.addEventListener("DOMContentLoaded", function() {
     Fireball.DAMAGE = 20;
     Fireball.img = new Image();
     Fireball.img.src = "images/fireball3.png";
+    Fireball.sound = document.getElementById("foom");
+    Fireball.sound.volume = 0.3;
     
     function Fireball(enemy) {
         AutoPilotedSprite.call(this, {
@@ -459,9 +461,6 @@ window.addEventListener("DOMContentLoaded", function() {
         
         this.x = enemy.x + (enemy.w - this.w) / 2;
         this.y = enemy.y + enemy.h;
-        this.frame = Math.floor(Math.random() * Fireball.NUM_FRAMES);
-        this.ticks = 0;
-        
         
         var _onMove = this.onMove;
         this.onMove = function(dx, dy) {
@@ -481,7 +480,7 @@ window.addEventListener("DOMContentLoaded", function() {
             return this.y > c.height;
         };
         
-        playSound(Torpedo.sound);
+        playSound(Fireball.sound);
     }
     
     Asteroid.WIDTH = 109;
