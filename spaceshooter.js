@@ -310,7 +310,7 @@ window.addEventListener("DOMContentLoaded", function() {
             document.removeEventListener("timer", moveStarshipToTargetX, false);
             mouseDown = false;
             keyStatus = {};
-            loop.pause();
+            music.pause();
             this.remove();
             new Explosion(this);
             document.getElementById("life" + Starship.num_lives).style.display = "none";
@@ -692,7 +692,7 @@ window.addEventListener("DOMContentLoaded", function() {
         
         this.draw = function() {
             ctx.drawImage(this.img, Math.round(this.x), Math.round(this.y));
-        }
+        };
         
         this.clear = function() {
             ctx.clearRect(Math.round(this.x), Math.round(this.y), this.w, this.h);
@@ -716,7 +716,6 @@ window.addEventListener("DOMContentLoaded", function() {
     Boss1.WIDTH = 132;
     Boss1.HEIGHT = 144;
     Boss1.SPEED = 5;
-    //Boss1.GENERATION_RATE = 1/6;
     Boss1.HP = 10000;
     Boss1.DAMAGE = 100;
     Boss1.POINTS = 1000;
@@ -724,6 +723,16 @@ window.addEventListener("DOMContentLoaded", function() {
     Boss1.img.src = "images/boss1.png";
     Boss1.spawned = false;
     Boss1.FIRE_DELAY = 1;
+    Boss1.music = document.getElementById("boss");
+    
+    // Fix for Firefox not looping audio:
+    if (typeof Boss1.music.loop != 'boolean') {
+        Boss1.music.addEventListener('ended', function() {
+            this.currentTime = 0;
+            this.play();
+        }, false);
+    }
+    Boss1.music.volume = 0.4;
     
     function Boss1() {
         Enemy.call(this, {
@@ -740,9 +749,9 @@ window.addEventListener("DOMContentLoaded", function() {
         this.dx = 0;
         this.canFire = true;
         
-        //this.x = Math.floor(Math.random() * (c.width - this.w));
-        //this.dx = (Math.floor(Math.random() * 2) - 0.5) * 4 *
-        //          (Math.floor(Math.random() * 2) + 1);
+        music.pause();
+        music = Boss1.music;
+        music.play();
         
         this.shoot = function() {
             var counter = Boss1.FIRE_DELAY;
@@ -785,9 +794,16 @@ window.addEventListener("DOMContentLoaded", function() {
             if (!player.dead && Math.abs(this.x + this.w/2 - player.x) < 20)
                 this.shoot();
             return _onMove.call(this, dx, dy);
-        }
+        };
         
-        
+        var _explode = this.explode;
+        this.explode = function() {
+            _explode.call(this);
+            
+            music.pause();
+            music = loop;
+            music.play();
+        };
     }
     
     function SpriteList() {
@@ -851,14 +867,14 @@ window.addEventListener("DOMContentLoaded", function() {
         
         this.pause = function() {
             this.paused = true;
-            loop.pause();
+            music.pause();
             document.getElementById("pause").style.visibility = "visible";
         };
         
         this.resume = function() {
             this.paused = false;
             document.getElementById("pause").style.visibility = "hidden";
-            loop.play();
+            music.play();
             this.dispatch();
         };
         
@@ -893,7 +909,6 @@ window.addEventListener("DOMContentLoaded", function() {
                     console.log(Boss1.spawned);
                     new Boss1();
                     Boss1.spawned = true;
-                    //console.log(Boss1.spawned);
                 }
             }
         }
@@ -924,11 +939,12 @@ window.addEventListener("DOMContentLoaded", function() {
         }, false);
     }
     loop.volume = LOOP_VOLUME;
+    var music = loop;
     
     window.addEventListener("load", function() {
         player = new Starship();
         player.draw();
-        loop.play();
+        music.play();
     }, false);
         
     var delay = LIFE_DELAY;
@@ -938,7 +954,7 @@ window.addEventListener("DOMContentLoaded", function() {
             document.removeEventListener("timer", nextLife, false);
             player = new Starship();
             player.draw();
-            loop.play();
+            music.play();
         }
     }
     
