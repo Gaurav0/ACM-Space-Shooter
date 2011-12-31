@@ -256,8 +256,10 @@ window.addEventListener("DOMContentLoaded", function() {
         
         var _draw = this.draw;
         this.draw = function() {
-            if (this.invulnerable)
+            if (this.invulnerable) {
                 ctx.globalAlpha = 0.05;
+                ctx.clearRect(this.x, this.y, this.w, this.h);
+            }
             _draw.call(this);
             ctx.globalAlpha = 1;
         };
