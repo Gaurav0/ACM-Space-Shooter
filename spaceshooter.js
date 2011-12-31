@@ -133,6 +133,8 @@ window.addEventListener("DOMContentLoaded", function() {
     function Enemy(args) {
         AutoPilotedSprite.call(this, args);
         
+        this.isEnemy = true;
+        
         this.explode = function() {
             this.remove();
             gameScore.add(this.constructor.POINTS);
@@ -778,16 +780,8 @@ window.addEventListener("DOMContentLoaded", function() {
             {
                 if (this.dx == 0)
                     this.dx = Boss1.SPEED;
-                //this.dx = Boss1.SPEED;
                 this.dy = 0;
-                /*if (this.x + this.w > c.width)
-                    this.dx = Boss1.speed*-1;
-                else if (this.x < 0)
-                    this.dx = Boss1.speed;
-                else
-                    this.dx = Boss1.speed;*/
                 if (!((this.x + dx) >= 0 && (this.x + this.w + dx) <= c.width)) {
-                    //this.dx = this.dx * -1 * Boss1.SPEED;
                     this.dx *= -1;
                 }
             }
@@ -837,6 +831,14 @@ window.addEventListener("DOMContentLoaded", function() {
                     return this.sprites[this.index++];
                 };
             })(this.sprites);
+        };
+        
+        this.filter = function(callback) {
+            var arr = [];
+            for (var i = 0; i < this.sprites.length; ++i)
+                if (callback(this.sprites[i]))
+                    arr.push(this.sprites[i]);
+            return arr;
         };
     }
     
@@ -901,12 +903,12 @@ window.addEventListener("DOMContentLoaded", function() {
     var ticks = 1;
     function generateEnemies() {
         if (gameScore.points >= 2000 && gameScore.points < 3000) {
-            console.log(spriteList.sprites);
-            if (spriteList.sprites.length == 1)
+            if (spriteList.filter(function(sprite) {
+                return sprite.isEnemy;
+            }).length == 0)
             {
                 if (!Boss1.spawned)
                 {
-                    console.log(Boss1.spawned);
                     new Boss1();
                     Boss1.spawned = true;
                 }
