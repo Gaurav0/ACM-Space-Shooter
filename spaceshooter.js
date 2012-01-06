@@ -609,6 +609,7 @@ window.addEventListener("DOMContentLoaded", function() {
     EnemyShip.img.src = "images/starshipdark.png";
     
     EnemyShip.numAlive = 0;
+    EnemyShip.midwayList = [];
     
     function EnemyShip() {
         Enemy.call(this, {
@@ -625,7 +626,19 @@ window.addEventListener("DOMContentLoaded", function() {
         this.dx = (Math.floor(Math.random() * 2) - 0.5) * 4 *
                   (Math.floor(Math.random() * 2) + 1);
         this.canFire = true;
-        this.midway = Math.floor(Math.random() * 7) * 50 + 50;
+        
+        var found;
+        var loclen = EnemyShip.midwayList.length;
+        do {
+            found = true;
+            this.midway = Math.floor(Math.random() * 350) + 50;
+            for (var j = 0; j < loclen; ++j) {
+                var prev = EnemyShip.midwayList[j];
+                if (this.midway >= prev - 50 && this.midway <= prev + 50)
+                    found = false;
+            }
+        } while (!found);
+        EnemyShip.midwayList.push(this.midway);
         EnemyShip.numAlive++;
         
         var _onMove = this.onMove;
@@ -663,6 +676,9 @@ window.addEventListener("DOMContentLoaded", function() {
         this.remove = function() {
             _remove.call(this);
             EnemyShip.numAlive--;
+            var idx = EnemyShip.midwayList.indexOf(this.midway);
+            if (idx != -1)
+                EnemyShip.midwayList.splice(idx, 1);
         };
     }
     
