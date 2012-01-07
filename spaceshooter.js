@@ -158,6 +158,9 @@ window.addEventListener("DOMContentLoaded", function() {
         };
     }
     
+    Drop.sound = document.getElementById("powerup");
+    Drop.sound.volume = 1;
+    
     function Drop(args) {
         AutoPilotedSprite.call(this, args);
         
@@ -174,6 +177,7 @@ window.addEventListener("DOMContentLoaded", function() {
             if (player.collide(this)) {
                 this.receive();
                 this.remove();
+                playSound(Drop.sound);
                 return false;
             }
             return true;
@@ -190,7 +194,7 @@ window.addEventListener("DOMContentLoaded", function() {
     Explosion.HEIGHT = 64;
     Explosion.FRAMES = 16;
     Explosion.sound = document.getElementById("boom");
-    Explosion.sound.volume = 0.4;
+    Explosion.sound.volume = 0.3;
     Explosion.img = new Image();
     Explosion.img.src = "images/explosion.png";
     
