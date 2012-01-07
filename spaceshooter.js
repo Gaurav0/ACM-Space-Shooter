@@ -158,6 +158,34 @@ window.addEventListener("DOMContentLoaded", function() {
         };
     }
     
+    function Drop(args) {
+        AutoPilotedSprite.call(this, args);
+        
+        this.deadSprite = args.deadSprite;
+        this.x = Math.floor(this.deadSprite.x - (this.w - this.deadSprite.w) / 2);
+        this.y = Math.floor(this.deadSprite.y - (this.h - this.deadSprite.h) / 2);
+        
+        this.isDrop = true;
+        
+        var _onMove = this.onMove;
+        this.onMove = function(dx, dy) {
+            if (!_onMove.call(this, dx, dy))
+                return false;
+            if (player.collide(this)) {
+                this.receive();
+                this.remove();
+                return false;
+            }
+            return true;
+        };        
+        
+        this.outOfBounds = function() {
+            return (this.y > c.height);
+        };
+        
+        this.receive = function() {};
+    }
+    
     Explosion.WIDTH = 64;
     Explosion.HEIGHT = 64;
     Explosion.FRAMES = 16;
@@ -168,7 +196,7 @@ window.addEventListener("DOMContentLoaded", function() {
     
     function Explosion(deadSprite) {
         Sprite.call(this, {
-            z: 10
+            z: 20
         });
     
         this.w = Math.floor(deadSprite.w * (4/3));
@@ -227,7 +255,7 @@ window.addEventListener("DOMContentLoaded", function() {
             y: Starship.START_Y,
             w: Starship.WIDTH, 
             h: Starship.HEIGHT,
-            z: 8,
+            z: 18,
             hp: Starship.HP, 
             img: Starship.img
         });
@@ -382,7 +410,7 @@ window.addEventListener("DOMContentLoaded", function() {
             var iterator = spriteList.iterator();
             while (iterator.hasNext()) {
                 var sprite = iterator.next();
-                if (sprite != this && sprite.damage && sprite.collide(this)) {
+                if (sprite != this && sprite.damage && !sprite.isDrop && sprite.collide(this)) {
                     this.damage(sprite.constructor.DAMAGE);
                     sprite.damage(Torpedo.DAMAGE);
                     return !this.dead;
@@ -411,7 +439,7 @@ window.addEventListener("DOMContentLoaded", function() {
         AutoPilotedSprite.call(this, {
             w: EnemyTorpedo.WIDTH, 
             h: EnemyTorpedo.HEIGHT,
-            z: 1,
+            z: 2,
             hp: EnemyTorpedo.HP, 
             img: EnemyTorpedo.img,
             dx: 0,
@@ -456,7 +484,7 @@ window.addEventListener("DOMContentLoaded", function() {
         AutoPilotedSprite.call(this, {
             w: Fireball.WIDTH, 
             h: Fireball.HEIGHT,
-            z: 1,
+            z: 3,
             hp: Fireball.HP, 
             img: Fireball.img,
             dx: 0,
@@ -487,6 +515,32 @@ window.addEventListener("DOMContentLoaded", function() {
         playSound(Fireball.sound);
     }
     
+    StarDrop.WIDTH = 48;
+    StarDrop.HEIGHT = 46;
+    StarDrop.SPEED = 4;
+    StarDrop.HP = 1;
+    StarDrop.POINTS = 100;
+    StarDrop.CHANCE = 1 / 3;
+    StarDrop.img = new Image();
+    StarDrop.img.src = "images/yellow_star.png";
+    
+    function StarDrop(deadSprite) {
+        Drop.call(this, {
+            w: StarDrop.WIDTH, 
+            h: StarDrop.HEIGHT,
+            z: 6,
+            hp: StarDrop.HP, 
+            img: StarDrop.img,
+            dx: 0,
+            dy: StarDrop.SPEED,
+            deadSprite: deadSprite
+        });
+        
+        this.receive = function() {
+            gameScore.add(StarDrop.POINTS);
+        };
+    }
+    
     Asteroid.WIDTH = 109;
     Asteroid.HEIGHT = 91;
     Asteroid.SPEED = 4;
@@ -504,7 +558,7 @@ window.addEventListener("DOMContentLoaded", function() {
             y: -Asteroid.HEIGHT,
             w: Asteroid.WIDTH, 
             h: Asteroid.HEIGHT,
-            z: 7,
+            z: 16,
             hp: Asteroid.HP, 
             img: Asteroid.img,
             dx: 0,
@@ -525,7 +579,14 @@ window.addEventListener("DOMContentLoaded", function() {
             if (this.ticks++ % (1 / Asteroid.ROTATION_RATE) == 0)
                 this.frame = (this.frame + 1) % Asteroid.NUM_FRAMES;
             return _onMove.call(this, dx, dy);
-        }
+        };
+        
+        var _explode = this.explode;
+        this.explode = function() {
+            _explode.call(this);
+            if (Math.floor(Math.random() / StarDrop.CHANCE) == 0)
+                new StarDrop(this);
+        };
     }
     
     Enemy1.WIDTH = 50;
@@ -543,7 +604,7 @@ window.addEventListener("DOMContentLoaded", function() {
             y: -Enemy1.HEIGHT,
             w: Enemy1.WIDTH,
             h: Enemy1.HEIGHT,
-            z: 4,
+            z: 13,
             hp: Enemy1.HP,
             img: Enemy1.img,
             dy: Enemy1.SPEED
@@ -577,7 +638,7 @@ window.addEventListener("DOMContentLoaded", function() {
             y: -Enemy2.HEIGHT,
             w: Enemy2.WIDTH,
             h: Enemy2.HEIGHT,
-            z: 5,
+            z: 12,
             hp: Enemy2.HP,
             img: Enemy2.img,
             dy: Enemy2.SPEED
@@ -616,7 +677,7 @@ window.addEventListener("DOMContentLoaded", function() {
             y: -EnemyShip.HEIGHT,
             w: EnemyShip.WIDTH,
             h: EnemyShip.HEIGHT,
-            z: 2,
+            z: 10,
             hp: EnemyShip.HP,
             img: EnemyShip.img,
             dy: EnemyShip.SPEED
@@ -698,7 +759,7 @@ window.addEventListener("DOMContentLoaded", function() {
             y: -EnemyUFO.HEIGHT,
             w: EnemyUFO.WIDTH,
             h: EnemyUFO.HEIGHT,
-            z: 3,
+            z: 11,
             hp: EnemyUFO.HP,
             img: EnemyUFO.img,
             dx: 0,
@@ -759,7 +820,7 @@ window.addEventListener("DOMContentLoaded", function() {
             y: -Boss1.HEIGHT,
             w: Boss1.WIDTH,
             h: Boss1.HEIGHT,
-            z: 4,
+            z: 9,
             hp: Boss1.HP,
             img: Boss1.img,
             dy: Boss1.SPEED
