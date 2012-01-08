@@ -1013,8 +1013,6 @@ window.addEventListener("DOMContentLoaded", function() {
                 }, 1000/Timer.FPS - timer.elapsed);
             }
         };
-        
-        window.addEventListener("load", this.dispatch, false);
     }
     
     var gameTimer = new Timer();
@@ -1065,11 +1063,17 @@ window.addEventListener("DOMContentLoaded", function() {
     loop.volume = LOOP_VOLUME;
     var music = loop;
     
-    window.addEventListener("load", function() {
+    function beginGame() {
+        var start = document.getElementById("start");
+        start.style.visibility = "hidden";
+        start.removeEventListener("click", beginGame, false);
+        window.removeEventListener("keydown", startHandler, false);
         player = new Starship();
         player.draw();
         music.play();
-    }, false);
+        window.addEventListener("keydown", pauseHandler, false);
+        gameTimer.dispatch();
+    }
         
     var delay = LIFE_DELAY;
     var nextLife = function() {
@@ -1147,6 +1151,13 @@ window.addEventListener("DOMContentLoaded", function() {
         }
     }
     
+    function startHandler(event) {
+        var keycode = event.keyCode;
+        if (keycode == keys.ENTER || keycode == keys.SPACE) {
+            beginGame();
+        }
+    }
+    
     function pauseHandler(event) {
         var keycode = event.keyCode;
         if (keycode == KEY_ESC) {
@@ -1158,7 +1169,6 @@ window.addEventListener("DOMContentLoaded", function() {
         }
     }
     
-    window.addEventListener("keydown", pauseHandler, false);
     var mouseDown = false;
     var mouseEn = document.getElementById("mouse_en");
     var mouseEnabled = mouseEn.checked;
@@ -1197,6 +1207,13 @@ window.addEventListener("DOMContentLoaded", function() {
             removeMouseListeners();
         }
     
+    }, false);
+    
+    window.addEventListener("load", function() {
+        var start = document.getElementById("start");
+        start.style.visibility = "visible";
+        start.addEventListener("click", beginGame, false);
+        window.addEventListener("keydown", startHandler, false);    
     }, false);
 
 }, false);

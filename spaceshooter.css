@@ -43,16 +43,8 @@
     font: 22px arial, sans-serif;
 }
 
-#start {
-    display: none;
-}
-
-#pause {
+.overlay {
     position: absolute;
-    top: 240px;
-    left: 105px;
-    width: 400px;
-    height: 100px;
     font: 50px bold arial, sans-serif;
     text-align: center;
     padding-top: 12px;
@@ -68,32 +60,41 @@
     background-color: rgba(0, 0, 255, 0.25);
 }
 
+#start {
+    top: 180px;
+    left: 105px;
+    width: 400px;
+    height: 260px;
+}
+
 #end {
-    position: absolute;
     top: 240px;
     left: 135px;
     width: 340px;
     height: 130px;
-    font: 50px bold arial, sans-serif;
-    text-align: center;
-    padding-top: 12px;
-    padding-left: 20px;
-    color: #ffff00;
-    letter-spacing: 20px;
-    text-transform: uppercase;
-    visibility: hidden;
-    border-style: solid;
-    border-width: 3px;
-    border-color: #ffff00;
-    border-radius: 30px;
-    background-color: rgba(0, 0, 255, 0.25);
 }
 
-#resume {
+#pause {
+    top: 240px;
+    left: 105px;
+    width: 400px;
+    height: 100px;
+}
+
+.underneath {
     font-size: 12px;
     font-weight: normal;
     letter-spacing: 6px;
-    margin-top: 8px;
+    line-height: 24px;
+}
+
+#begin {
+    margin-top: 16px;
+    margin-left: -10px;
+}
+
+#resume {
+    margin-top: 2px;
     margin-left: -10px;
 }
 
