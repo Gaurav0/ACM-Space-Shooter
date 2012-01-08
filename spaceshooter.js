@@ -334,9 +334,20 @@ window.addEventListener("DOMContentLoaded", function() {
                 _damage.call(this, dmg);
                 if (this.hp < 0)
                     this.hp = 0;
-                document.getElementById("health").style.width = (this.hp / Starship.HP) * 100 + "%";
+                this.updateHealthBar();
             }
-        }
+        };
+        
+        this.restore = function(points) {
+            this.hp += points;
+            if (this.hp > Starship.HP)
+                this.hp = Starship.HP;
+            this.updateHealthBar();
+        };
+        
+        this.updateHealthBar = function() {
+            document.getElementById("health").style.width = (this.hp / Starship.HP) * 100 + "%";
+        };
         
         this.explode = function() {
             window.removeEventListener("keydown", keyDownHandler, false);
@@ -524,7 +535,7 @@ window.addEventListener("DOMContentLoaded", function() {
     StarDrop.SPEED = 4;
     StarDrop.HP = 1;
     StarDrop.POINTS = 100;
-    StarDrop.CHANCE = 1 / 3;
+    StarDrop.CHANCE = 1 / 4;
     StarDrop.img = new Image();
     StarDrop.img.src = "images/yellow_star.png";
     
@@ -542,6 +553,32 @@ window.addEventListener("DOMContentLoaded", function() {
         
         this.receive = function() {
             gameScore.add(StarDrop.POINTS);
+        };
+    }
+    
+    HeartDrop.WIDTH = 50;
+    HeartDrop.HEIGHT = 50;
+    HeartDrop.SPEED = 4;
+    HeartDrop.HP = 1;
+    HeartDrop.POINTS = 20;
+    HeartDrop.CHANCE = 1 / 7;
+    HeartDrop.img = new Image();
+    HeartDrop.img.src = "images/red_heart.png";
+    
+    function HeartDrop(deadSprite) {
+        Drop.call(this, {
+            w: HeartDrop.WIDTH, 
+            h: HeartDrop.HEIGHT,
+            z: 7,
+            hp: HeartDrop.HP, 
+            img: HeartDrop.img,
+            dx: 0,
+            dy: HeartDrop.SPEED,
+            deadSprite: deadSprite
+        });
+        
+        this.receive = function() {
+            player.restore(HeartDrop.POINTS);
         };
     }
     
@@ -590,6 +627,8 @@ window.addEventListener("DOMContentLoaded", function() {
             _explode.call(this);
             if (Math.floor(Math.random() / StarDrop.CHANCE) == 0)
                 new StarDrop(this);
+            else if (Math.floor(Math.random() / HeartDrop.CHANCE) == 0)
+                new HeartDrop(this);
         };
     }
     
@@ -598,7 +637,7 @@ window.addEventListener("DOMContentLoaded", function() {
     Enemy1.SPEED = 5;
     Enemy1.GENERATION_RATE = 1/6;
     Enemy1.HP = 100;
-    Enemy1.DAMAGE = 20;
+    Enemy1.DAMAGE = 30;
     Enemy1.POINTS = 10;
     Enemy1.img = new Image();
     Enemy1.img.src = "images/enemy1.png";
@@ -632,7 +671,7 @@ window.addEventListener("DOMContentLoaded", function() {
     Enemy2.SPEED = 5;
     Enemy2.GENERATION_RATE = 1/6;
     Enemy2.HP = 100;
-    Enemy2.DAMAGE = 20;
+    Enemy2.DAMAGE = 30;
     Enemy2.POINTS = 10;
     Enemy2.img = new Image();
     Enemy2.img.src = "images/enemy2.png";
@@ -753,8 +792,8 @@ window.addEventListener("DOMContentLoaded", function() {
     EnemyUFO.GENERATION_RATE = 1/5;
     EnemyUFO.ROTATION_RATE = 6;
     EnemyUFO.HP = 100;
-    EnemyUFO.DAMAGE = 20;
-    EnemyUFO.POINTS = 10;
+    EnemyUFO.DAMAGE = 30;
+    EnemyUFO.POINTS = 20;
     EnemyUFO.img = new Image();
     EnemyUFO.img.src = "images/ufodark.png";
     
