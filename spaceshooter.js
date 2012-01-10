@@ -1064,9 +1064,8 @@ window.addEventListener("DOMContentLoaded", function() {
     var music = loop;
     
     function beginGame() {
-        var start = document.getElementById("start");
-        start.style.visibility = "hidden";
-        start.removeEventListener("click", beginGame, false);
+        document.getElementById("start").style.visibility = "hidden";
+        document.getElementById("begin").removeEventListener("click", beginGame, false);
         window.removeEventListener("keydown", startHandler, false);
         player = new Starship();
         player.draw();
@@ -1158,6 +1157,13 @@ window.addEventListener("DOMContentLoaded", function() {
         }
     }
     
+    function creditsHandler(event) {
+        var keycode = event.keyCode;
+        if (keycode == keys.ENTER || keycode == keys.SPACE) {
+            returnToStart();
+        }
+    }
+    
     function pauseHandler(event) {
         var keycode = event.keyCode;
         if (keycode == KEY_ESC) {
@@ -1209,11 +1215,27 @@ window.addEventListener("DOMContentLoaded", function() {
     
     }, false);
     
+    function showCredits() {
+        document.getElementById("start").style.visibility = "hidden";
+        document.getElementById("credits").style.visibility = "visible";
+        window.removeEventListener("keydown", startHandler, false);
+        window.addEventListener("keydown", creditsHandler, false);
+    }
+    
+    function returnToStart() {
+        document.getElementById("credits").style.visibility = "hidden";
+        document.getElementById("start").style.visibility = "visible";
+        window.removeEventListener("keydown", creditsHandler, false);
+        window.addEventListener("keydown", startHandler, false);
+    }
+    
+    document.getElementById("credits_link").addEventListener("click", showCredits, false);    
+    document.getElementById("credits").addEventListener("click", returnToStart, false);
+    
     window.addEventListener("load", function() {
-        var start = document.getElementById("start");
-        start.style.visibility = "visible";
-        start.addEventListener("click", beginGame, false);
-        window.addEventListener("keydown", startHandler, false);    
+        document.getElementById("start").style.visibility = "visible";
+        document.getElementById("begin").addEventListener("click", beginGame, false);
+        window.addEventListener("keydown", startHandler, false);
     }, false);
 
 }, false);
