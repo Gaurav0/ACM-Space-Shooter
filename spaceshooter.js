@@ -407,7 +407,7 @@ window.addEventListener("DOMContentLoaded", function() {
         AutoPilotedSprite.call(this, {
             w: Torpedo.WIDTH, 
             h: Torpedo.HEIGHT,
-            z: 1,
+            z: 4,
             hp: Torpedo.HP, 
             img: Torpedo.img,
             dx: 0,
@@ -454,7 +454,7 @@ window.addEventListener("DOMContentLoaded", function() {
         AutoPilotedSprite.call(this, {
             w: EnemyTorpedo.WIDTH, 
             h: EnemyTorpedo.HEIGHT,
-            z: 2,
+            z: 5,
             hp: EnemyTorpedo.HP, 
             img: EnemyTorpedo.img,
             dx: 0,
@@ -499,7 +499,7 @@ window.addEventListener("DOMContentLoaded", function() {
         AutoPilotedSprite.call(this, {
             w: Fireball.WIDTH, 
             h: Fireball.HEIGHT,
-            z: 3,
+            z: 6,
             hp: Fireball.HP, 
             img: Fireball.img,
             dx: 0,
@@ -543,7 +543,7 @@ window.addEventListener("DOMContentLoaded", function() {
         Drop.call(this, {
             w: StarDrop.WIDTH, 
             h: StarDrop.HEIGHT,
-            z: 6,
+            z: 1,
             hp: StarDrop.HP, 
             img: StarDrop.img,
             dx: 0,
@@ -569,7 +569,7 @@ window.addEventListener("DOMContentLoaded", function() {
         Drop.call(this, {
             w: HeartDrop.WIDTH, 
             h: HeartDrop.HEIGHT,
-            z: 7,
+            z: 2,
             hp: HeartDrop.HP, 
             img: HeartDrop.img,
             dx: 0,
@@ -663,7 +663,7 @@ window.addEventListener("DOMContentLoaded", function() {
                 this.dx *= -1;
             }
             return _onMove.call(this, dx, dy);
-        }
+        };
     }
     
     Enemy2.WIDTH = 54;
@@ -691,13 +691,22 @@ window.addEventListener("DOMContentLoaded", function() {
         this.dx = (Math.floor(Math.random() * 2) - 0.5) * 4 *
                   (Math.floor(Math.random() * 2) + 1);
         
+        this.draw = function() {
+            if (this.dx > 0)
+                ctx.drawImage(this.img, 0, 0, this.w, this.h,
+                    this.x, this.y, this.w, this.h);
+            else
+                ctx.drawImage(this.img, this.w, 0, this.w, this.h,
+                    this.x, this.y, this.w, this.h);
+        };
+        
         var _onMove = this.onMove;
         this.onMove = function(dx, dy) {
             if (!((this.x + dx) >= 0 && (this.x + this.w + dx) <= c.width)) {
                 this.dx *= -1;
             }
             return _onMove.call(this, dx, dy);
-        }
+        };
     }
     
     EnemyShip.WIDTH = 48;
