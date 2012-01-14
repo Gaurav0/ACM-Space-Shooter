@@ -1082,7 +1082,7 @@ window.addEventListener("DOMContentLoaded", function() {
 
     function Combo() {
 
-        var combo = document.getElementById("combo");
+        var div = document.getElementById("combo");
         this.combo = 0;
 
         this.inc = function() {
@@ -1096,7 +1096,7 @@ window.addEventListener("DOMContentLoaded", function() {
         }
 
         this.update = function() {
-            combo.textContent = "Combo x" + this.combo;
+            div.textContent = "+" + this.combo;
         }
     }
 
