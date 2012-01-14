@@ -186,7 +186,6 @@ window.addEventListener("DOMContentLoaded", function() {
         var _explode = this.explode;
         this.explode = function() {            
             if (--this.constructor.numAlive == 0) {
-                player.level++;
                 player.updateLevel();
                 music.pause();
                 music = loop;
@@ -1121,8 +1120,10 @@ window.addEventListener("DOMContentLoaded", function() {
                 return "isEnemy" in sprite;
             }).length == 0)
             {
-                if (!Boss1.spawned) 
+                if (!Boss1.spawned) {
+                    player.level = 2;
                     new Boss1();
+                }
             }
         } else if (gameScore.points >= 10000 && gameScore.points < 13000) {
             if (spriteList.filter(function(sprite) {
@@ -1131,6 +1132,7 @@ window.addEventListener("DOMContentLoaded", function() {
             {
                 if (!Boss2.spawned)
                 {
+                    player.level = 3;
                     new Boss2(c.width / 2 - Boss2.WIDTH / 2, Boss2.SPEED, 260);
                     new Boss2(3 * c.width / 4 - Boss2.WIDTH / 2, -Boss2.SPEED, 150);
                     new Boss2(c.width / 4 - Boss2.WIDTH / 2, Boss2.SPEED, 40);
