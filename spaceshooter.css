@@ -53,6 +53,16 @@
     font: 22px arial, sans-serif;
 }
 
+#combo {
+    position: absolute;
+    top: 25px;
+    left: 340px;
+    width: 200px;
+    text-align: center;
+    color: #ffff00;
+    font: 22px arial, sans-serif;
+}
+
 .overlay {
     position: absolute;
     font: 50px bold arial, sans-serif;
