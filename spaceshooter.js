@@ -11,6 +11,11 @@ window.addEventListener("DOMContentLoaded", function() {
     var LIFE_DELAY = 60;
     var INVULNERABLE_PERIOD = 60;
     
+    var gameTimer = new Timer();
+    var spriteList = new SpriteList();
+    var player;
+    var gameScore = new Score();
+    
     function Sprite(args) {
         
         this.x = args.x;
@@ -181,10 +186,14 @@ window.addEventListener("DOMContentLoaded", function() {
         var _explode = this.explode;
         this.explode = function() {            
             if (--this.constructor.numAlive == 0) {
+                console.log("zero");
+                player.level++;
+                player.updateLevel();
                 music.pause();
                 music = loop;
                 music.play();
             }
+            console.log(this.constructor.numAlive + " " + player.level);
             
             _explode.call(this);
         };
@@ -296,6 +305,7 @@ window.addEventListener("DOMContentLoaded", function() {
             img: Starship.img
         });
         
+        this.level = 1;
         this.canFire = true;
         document.getElementById("health").style.width = "100%";
         Starship.num_lives--;
@@ -381,6 +391,10 @@ window.addEventListener("DOMContentLoaded", function() {
             document.getElementById("health").style.width = (this.hp / Starship.HP) * 100 + "%";
         };
         
+        this.updateLevel = function() {
+            document.getElementById("level").textContent = "Level " + this.level;
+        };
+        
         this.explode = function() {
             window.removeEventListener("keydown", keyDownHandler, false);
             window.removeEventListener("keydown", keyUpHandler, false);
@@ -457,7 +471,7 @@ window.addEventListener("DOMContentLoaded", function() {
             var iterator = spriteList.iterator();
             while (iterator.hasNext()) {
                 var sprite = iterator.next();
-                if (sprite != this && sprite.damage && !sprite.isDrop && sprite.collide(this)) {
+                if (sprite != this && sprite.damage && !("isDrop" in sprite) && sprite.collide(this)) {
                     this.damage(sprite.constructor.DAMAGE);
                     sprite.damage(Torpedo.DAMAGE);
                     return !this.dead;
@@ -617,7 +631,7 @@ window.addEventListener("DOMContentLoaded", function() {
     Asteroid.WIDTH = 109;
     Asteroid.HEIGHT = 91;
     Asteroid.SPEED = 4;
-    Asteroid.GENERATION_RATE = 1 / 4;
+    Asteroid.GENERATION_RATE = [1/5, 1/4, 1/3];
     Asteroid.ROTATION_RATE = 1 / 3;
     Asteroid.HP = 1000;
     Asteroid.DAMAGE = 1000;
@@ -667,7 +681,7 @@ window.addEventListener("DOMContentLoaded", function() {
     Enemy1.WIDTH = 50;
     Enemy1.HEIGHT = 50;
     Enemy1.SPEED = 5;
-    Enemy1.GENERATION_RATE = 1/6;
+    Enemy1.GENERATION_RATE = [1/6, 1/5, 1/4];
     Enemy1.HP = 100;
     Enemy1.DAMAGE = 30;
     Enemy1.POINTS = 10;
@@ -701,7 +715,7 @@ window.addEventListener("DOMContentLoaded", function() {
     Enemy2.WIDTH = 54;
     Enemy2.HEIGHT = 56;
     Enemy2.SPEED = 5;
-    Enemy2.GENERATION_RATE = 1/6;
+    Enemy2.GENERATION_RATE = [1/6, 1/5, 1/4];
     Enemy2.HP = 100;
     Enemy2.DAMAGE = 30;
     Enemy2.POINTS = 10;
@@ -744,12 +758,12 @@ window.addEventListener("DOMContentLoaded", function() {
     EnemyShip.WIDTH = 48;
     EnemyShip.HEIGHT = 48;
     EnemyShip.SPEED = 3;
-    EnemyShip.GENERATION_RATE = 1/5;
+    EnemyShip.GENERATION_RATE = [1/7, 1/6, 1/5];
     EnemyShip.HP = 100;
     EnemyShip.DAMAGE = 20;
     EnemyShip.POINTS = 100;
     EnemyShip.FIRE_DELAY = 8;
-    EnemyShip.MAX_NUM = 3;
+    EnemyShip.MAX_NUM = [0, 1, 3];
     EnemyShip.img = new Image();
     EnemyShip.img.src = "images/starshipdark.png";
     
@@ -830,7 +844,7 @@ window.addEventListener("DOMContentLoaded", function() {
     EnemyUFO.WIDTH = 48;
     EnemyUFO.HEIGHT = 48;
     EnemyUFO.SPEED = 2;
-    EnemyUFO.GENERATION_RATE = 1/5;
+    EnemyUFO.GENERATION_RATE = [1/6, 1/5, 1/4];
     EnemyUFO.ROTATION_RATE = 6;
     EnemyUFO.HP = 100;
     EnemyUFO.DAMAGE = 30;
@@ -948,7 +962,7 @@ window.addEventListener("DOMContentLoaded", function() {
     Boss2.DAMAGE = 1000;
     Boss2.POINTS = 1000;
     Boss2.FIRE_DELAY = 8;
-    Boss2.MISSILE_SEPARATION = 42;
+    Boss2.TORPEDO_SEPARATION = 42;
     Boss2.img = new Image();
     Boss2.img.src = "images/boss2.png";
     Boss2.spawned = false;
@@ -987,8 +1001,8 @@ window.addEventListener("DOMContentLoaded", function() {
                 this.canFire = false;
                 document.addEventListener("timer", fireDelay, false);
                 new EnemyTorpedo(this, 0);
-                new EnemyTorpedo(this, -Boss2.MISSILE_SEPARATION);
-                new EnemyTorpedo(this, Boss2.MISSILE_SEPARATION);
+                new EnemyTorpedo(this, -Boss2.TORPEDO_SEPARATION);
+                new EnemyTorpedo(this, Boss2.TORPEDO_SEPARATION);
             }
         };
         
@@ -1102,16 +1116,11 @@ window.addEventListener("DOMContentLoaded", function() {
         };
     }
     
-    var gameTimer = new Timer();
-    var spriteList = new SpriteList();
-    var player;
-    var gameScore = new Score();
-    
     var ticks = 1;
     function generateEnemies() {
-        if (gameScore.points >= 2000 && gameScore.points < 3000) {
+        if (gameScore.points >= 1000 && gameScore.points < 2000) {
             if (spriteList.filter(function(sprite) {
-                return sprite.isEnemy;
+                return "isEnemy" in sprite;
             }).length == 0)
             {
                 if (!Boss1.spawned) 
@@ -1119,7 +1128,7 @@ window.addEventListener("DOMContentLoaded", function() {
             }
         } else if (gameScore.points >= 5000 && gameScore.points < 8000) {
             if (spriteList.filter(function(sprite) {
-                return sprite.isEnemy;
+                return "isEnemy" in sprite;
             }).length == 0)
             {
                 if (!Boss2.spawned)
@@ -1131,17 +1140,18 @@ window.addEventListener("DOMContentLoaded", function() {
             }
         } else {
             ticks++;
-            if (ticks % (Timer.FPS / Asteroid.GENERATION_RATE) == 0)
+            var level = player.level - 1;
+            if (ticks % (Timer.FPS / Asteroid.GENERATION_RATE[level]) == 0)
                 new Asteroid();
-            if (ticks % (Timer.FPS / EnemyUFO.GENERATION_RATE) == 0)
+            if (ticks % (Timer.FPS / EnemyUFO.GENERATION_RATE[level]) == 0)
                 new EnemyUFO();
-            if (ticks % (Timer.FPS / Enemy1.GENERATION_RATE) == 0)
+            if (ticks % (Timer.FPS / Enemy1.GENERATION_RATE[level]) == 0)
                 new Enemy1();
-            if (ticks % (Timer.FPS / Enemy2.GENERATION_RATE) ==
-                    Timer.FPS / Enemy2.GENERATION_RATE / 2)
+            if (ticks % (Timer.FPS / Enemy2.GENERATION_RATE[level]) ==
+                    Timer.FPS / Enemy2.GENERATION_RATE[level] / 2)
                 new Enemy2();
-            if (ticks % (Timer.FPS / EnemyShip.GENERATION_RATE) == 0 &&
-                    EnemyShip.numAlive < EnemyShip.MAX_NUM)
+            if (ticks % (Timer.FPS / EnemyShip.GENERATION_RATE[level]) == 0 &&
+                    EnemyShip.numAlive < EnemyShip.MAX_NUM[level])
                 new EnemyShip();
         }
     }

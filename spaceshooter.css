@@ -43,6 +43,16 @@
     font: 22px arial, sans-serif;
 }
 
+#level {
+    position: absolute;
+    top: 25px;
+    left: 240px;
+    width: 100px;
+    text-align: right;
+    color: #ffff00;
+    font: 22px arial, sans-serif;
+}
+
 .overlay {
     position: absolute;
     font: 50px bold arial, sans-serif;
