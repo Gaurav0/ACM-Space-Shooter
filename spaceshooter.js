@@ -158,6 +158,38 @@ window.addEventListener("DOMContentLoaded", function() {
         };
     }
     
+    Boss.music = document.getElementById("boss");
+    
+    // Fix for Firefox not looping audio:
+    if (typeof Boss.music.loop != 'boolean') {
+        Boss.music.addEventListener('ended', function() {
+            this.currentTime = 0;
+            this.play();
+        }, false);
+    }
+    Boss.music.volume = 0.4;
+    
+    function Boss(args) {
+        Enemy.call(this, args);
+        
+        this.constructor.numAlive++;
+        this.constructor.spawned = true;
+        music.pause();
+        music = Boss.music;
+        music.play();
+        
+        var _explode = this.explode;
+        this.explode = function() {            
+            if (--this.constructor.numAlive == 0) {
+                music.pause();
+                music = loop;
+                music.play();
+            }
+            
+            _explode.call(this);
+        };
+    }
+    
     Drop.sound = document.getElementById("powerup");
     Drop.sound.volume = 1;
     
@@ -450,7 +482,7 @@ window.addEventListener("DOMContentLoaded", function() {
     EnemyTorpedo.img = new Image();
     EnemyTorpedo.img.src = "images/torpedodark.png";
     
-    function EnemyTorpedo(enemy) {
+    function EnemyTorpedo(enemy, xOffset) {
         AutoPilotedSprite.call(this, {
             w: EnemyTorpedo.WIDTH, 
             h: EnemyTorpedo.HEIGHT,
@@ -461,7 +493,7 @@ window.addEventListener("DOMContentLoaded", function() {
             dy: EnemyTorpedo.SPEED
         });
         
-        this.x = enemy.x + (enemy.w - this.w) / 2;
+        this.x = (enemy.x + (enemy.w - this.w) / 2) + xOffset;
         this.y = enemy.y + enemy.h;
         
         var _onMove = this.onMove;
@@ -781,7 +813,7 @@ window.addEventListener("DOMContentLoaded", function() {
             if (this.canFire) {
                 this.canFire = false;
                 document.addEventListener("timer", fireDelay, false);
-                new EnemyTorpedo(this);
+                new EnemyTorpedo(this, 0);
             }
         };
         
@@ -850,25 +882,16 @@ window.addEventListener("DOMContentLoaded", function() {
     Boss1.HEIGHT = 144;
     Boss1.SPEED = 5;
     Boss1.HP = 10000;
-    Boss1.DAMAGE = 100;
+    Boss1.DAMAGE = 1000;
     Boss1.POINTS = 1000;
+    Boss1.FIRE_DELAY = 1;
     Boss1.img = new Image();
     Boss1.img.src = "images/boss1.png";
     Boss1.spawned = false;
-    Boss1.FIRE_DELAY = 1;
-    Boss1.music = document.getElementById("boss");
-    
-    // Fix for Firefox not looping audio:
-    if (typeof Boss1.music.loop != 'boolean') {
-        Boss1.music.addEventListener('ended', function() {
-            this.currentTime = 0;
-            this.play();
-        }, false);
-    }
-    Boss1.music.volume = 0.4;
+    Boss1.numAlive = 0;
     
     function Boss1() {
-        Enemy.call(this, {
+        Boss.call(this, {
             y: -Boss1.HEIGHT,
             w: Boss1.WIDTH,
             h: Boss1.HEIGHT,
@@ -881,10 +904,6 @@ window.addEventListener("DOMContentLoaded", function() {
         this.x = c.width/2 - this.w/2;
         this.dx = 0;
         this.canFire = true;
-        
-        music.pause();
-        music = Boss1.music;
-        music.play();
         
         this.shoot = function() {
             var counter = Boss1.FIRE_DELAY;
@@ -920,14 +939,73 @@ window.addEventListener("DOMContentLoaded", function() {
                 this.shoot();
             return _onMove.call(this, dx, dy);
         };
+    }
+    
+    Boss2.WIDTH = 122;
+    Boss2.HEIGHT = 101;
+    Boss2.SPEED = 4;
+    Boss2.HP = 2000;
+    Boss2.DAMAGE = 1000;
+    Boss2.POINTS = 1000;
+    Boss2.FIRE_DELAY = 8;
+    Boss2.MISSILE_SEPARATION = 42;
+    Boss2.img = new Image();
+    Boss2.img.src = "images/boss2.png";
+    Boss2.spawned = false;
+    Boss2.numAlive = 0;
+    
+    function Boss2(x, pdx, midway) {
+        Boss.call(this, {
+            y: -Boss2.HEIGHT,
+            w: Boss2.WIDTH,
+            h: Boss2.HEIGHT,
+            z: 9,
+            hp: Boss2.HP,
+            img: Boss2.img,
+            dx: 0,
+            dy: Boss2.SPEED
+        });
         
-        var _explode = this.explode;
-        this.explode = function() {
-            _explode.call(this);
+        this.x = x;
+        this.pdx = pdx;
+        this.midway = midway;
+        this.canFire = true;
+        
+        this.shoot = function() {
+            var counter = Boss2.FIRE_DELAY;
+            var Boss2l = this;
             
-            music.pause();
-            music = loop;
-            music.play();
+            var fireDelay = function() {
+                counter--;
+                if (counter == 0) {
+                    Boss2l.canFire = true;
+                    document.removeEventListener("timer", fireDelay, false);
+                }
+            };
+            
+            if (this.canFire) {
+                this.canFire = false;
+                document.addEventListener("timer", fireDelay, false);
+                new EnemyTorpedo(this, 0);
+                new EnemyTorpedo(this, -Boss2.MISSILE_SEPARATION);
+                new EnemyTorpedo(this, Boss2.MISSILE_SEPARATION);
+            }
+        };
+        
+        var _onMove = this.onMove;
+        this.onMove = function(dx, dy) {
+            if (this.y > this.midway)
+            {
+                this.dy = 0;
+                if (this.dx == 0)
+                    this.dx = this.pdx;
+                if (!((this.x + dx) >= 0 && (this.x + this.w + dx) <= c.width)) {
+                    this.dx *= -1;
+                }
+            }
+            if (!player.dead && Math.abs(this.x + this.w/2 - (player.x + player.w/2)) < 50)
+                this.shoot();
+            return _onMove.call(this, dx, dy);
         };
     }
     
@@ -1036,14 +1114,22 @@ window.addEventListener("DOMContentLoaded", function() {
                 return sprite.isEnemy;
             }).length == 0)
             {
-                if (!Boss1.spawned)
-                {
+                if (!Boss1.spawned) 
                     new Boss1();
-                    Boss1.spawned = true;
+            }
+        } else if (gameScore.points >= 5000 && gameScore.points < 8000) {
+            if (spriteList.filter(function(sprite) {
+                return sprite.isEnemy;
+            }).length == 0)
+            {
+                if (!Boss2.spawned)
+                {
+                    new Boss2(c.width / 2 - Boss2.WIDTH / 2, Boss2.SPEED, 260);
+                    new Boss2(3 * c.width / 4 - Boss2.WIDTH / 2, -Boss2.SPEED, 150);
+                    new Boss2(c.width / 4 - Boss2.WIDTH / 2, Boss2.SPEED, 40);
                 }
             }
-        }
-        else {
+        } else {
             ticks++;
             if (ticks % (Timer.FPS / Asteroid.GENERATION_RATE) == 0)
                 new Asteroid();
