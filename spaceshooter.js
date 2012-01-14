@@ -186,7 +186,7 @@ window.addEventListener("DOMContentLoaded", function() {
         var _explode = this.explode;
         this.explode = function() {            
             if (--this.constructor.numAlive == 0) {
-                player.updateLevel();
+                gameScore.updateLevel();
                 music.pause();
                 music = loop;
                 music.play();
@@ -302,7 +302,6 @@ window.addEventListener("DOMContentLoaded", function() {
             img: Starship.img
         });
         
-        this.level = 1;
         this.canFire = true;
         document.getElementById("health").style.width = "100%";
         Starship.num_lives--;
@@ -386,10 +385,6 @@ window.addEventListener("DOMContentLoaded", function() {
         
         this.updateHealthBar = function() {
             document.getElementById("health").style.width = (this.hp / Starship.HP) * 100 + "%";
-        };
-        
-        this.updateLevel = function() {
-            document.getElementById("level").textContent = "Level " + this.level;
         };
         
         this.explode = function() {
@@ -1066,6 +1061,7 @@ window.addEventListener("DOMContentLoaded", function() {
         
         var score = document.getElementById("score");
         this.points = 0;
+        this.level = 1;
         
         this.add = function(points) {
             this.points += points;
@@ -1074,6 +1070,10 @@ window.addEventListener("DOMContentLoaded", function() {
         
         this.update = function() {
             score.textContent = this.points;
+        };
+        
+        this.updateLevel = function() {
+            document.getElementById("level").textContent = "Level " + this.level;
         };
     }
     
@@ -1121,7 +1121,7 @@ window.addEventListener("DOMContentLoaded", function() {
             }).length == 0)
             {
                 if (!Boss1.spawned) {
-                    player.level = 2;
+                    gameScore.level = 2;
                     new Boss1();
                 }
             }
@@ -1132,7 +1132,7 @@ window.addEventListener("DOMContentLoaded", function() {
             {
                 if (!Boss2.spawned)
                 {
-                    player.level = 3;
+                    gameScore.level = 3;
                     new Boss2(c.width / 2 - Boss2.WIDTH / 2, Boss2.SPEED, 260);
                     new Boss2(3 * c.width / 4 - Boss2.WIDTH / 2, -Boss2.SPEED, 150);
                     new Boss2(c.width / 4 - Boss2.WIDTH / 2, Boss2.SPEED, 40);
@@ -1140,7 +1140,7 @@ window.addEventListener("DOMContentLoaded", function() {
             }
         } else {
             ticks++;
-            var level = player.level - 1;
+            var level = gameScore.level - 1;
             if (ticks % (Timer.FPS / Asteroid.GENERATION_RATE[level]) == 0)
                 new Asteroid();
             if (ticks % (Timer.FPS / EnemyUFO.GENERATION_RATE[level]) == 0)
