@@ -186,14 +186,12 @@ window.addEventListener("DOMContentLoaded", function() {
         var _explode = this.explode;
         this.explode = function() {            
             if (--this.constructor.numAlive == 0) {
-                console.log("zero");
                 player.level++;
                 player.updateLevel();
                 music.pause();
                 music = loop;
                 music.play();
             }
-            console.log(this.constructor.numAlive + " " + player.level);
             
             _explode.call(this);
         };
@@ -1118,7 +1116,7 @@ window.addEventListener("DOMContentLoaded", function() {
     
     var ticks = 1;
     function generateEnemies() {
-        if (gameScore.points >= 1000 && gameScore.points < 2000) {
+        if (gameScore.points >= 2500 && gameScore.points < 3500) {
             if (spriteList.filter(function(sprite) {
                 return "isEnemy" in sprite;
             }).length == 0)
@@ -1126,7 +1124,7 @@ window.addEventListener("DOMContentLoaded", function() {
                 if (!Boss1.spawned) 
                     new Boss1();
             }
-        } else if (gameScore.points >= 5000 && gameScore.points < 8000) {
+        } else if (gameScore.points >= 10000 && gameScore.points < 13000) {
             if (spriteList.filter(function(sprite) {
                 return "isEnemy" in sprite;
             }).length == 0)
