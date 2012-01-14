@@ -15,6 +15,7 @@ window.addEventListener("DOMContentLoaded", function() {
     var spriteList = new SpriteList();
     var player;
     var gameScore = new Score();
+    var gameCombo = new Combo();
     
     function Sprite(args) {
         
@@ -142,7 +143,8 @@ window.addEventListener("DOMContentLoaded", function() {
         
         this.explode = function() {
             this.remove();
-            gameScore.add(this.constructor.POINTS);
+            gameScore.add(this.constructor.POINTS + gameCombo.combo);
+            gameCombo.inc();
             new Explosion(this);
         };
         
@@ -375,6 +377,7 @@ window.addEventListener("DOMContentLoaded", function() {
                 if (this.hp < 0)
                     this.hp = 0;
                 this.updateHealthBar();
+                gameCombo.reset();
             }
         };
         
@@ -1077,6 +1080,28 @@ window.addEventListener("DOMContentLoaded", function() {
             score.textContent = this.points;
         };
     }
+
+    function Combo() {
+
+        var combo = document.getElementById("combo");
+        this.combo = 0;
+
+        this.inc = function() {
+            this.combo++;
+            this.update();
+        }
+
+        this.reset = function() {
+            this.combo = 0;
+            this.update();
+        }
+
+        this.update = function() {
+            combo.textContent = "Combo x" + this.combo;
+        }
+    }
+
+
     
     Timer.FPS = 24;
     function Timer() {
