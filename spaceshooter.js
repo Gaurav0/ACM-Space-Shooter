@@ -1347,16 +1347,16 @@ window.addEventListener("DOMContentLoaded", function() {
     
     var touchDown = false;
     
-    document.addEventListener("touchmove", function(event) {
+    window.addEventListener("touchmove", function(event) {
         player.setTargetX(event.touches[0].pageX);
         event.preventDefault();
     }, false);
     
-    document.addEventListener("touchStart", function(event) {
+    window.addEventListener("touchstart", function(event) {
         touchDown = true;
     }, false);
     
-    document.addEventListener("touchEnd", function(event) {
+    window.addEventListener("touchend", function(event) {
         touchDown = false;
     }, false);
     
