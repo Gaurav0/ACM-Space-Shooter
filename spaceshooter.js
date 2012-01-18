@@ -429,7 +429,7 @@ window.addEventListener("DOMContentLoaded", function() {
         };
         
         this.setTargetX = function(targetX) {
-            this.targetX = targetX;
+            this.targetX = targetX - Math.round(this.w * 3 / 4);
             document.addEventListener("timer", moveStarshipToTargetX, false);
         };
     }
