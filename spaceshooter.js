@@ -1275,7 +1275,7 @@ window.addEventListener("DOMContentLoaded", function() {
             player.move(0, MOVEMENT_RATE);
         }
         
-        if (keyStatus[keys.SPACE] || keyStatus[keys.ENTER] || mouseDown) {
+        if (keyStatus[keys.SPACE] || keyStatus[keys.ENTER] || mouseDown || touchDown) {
             player.shoot();
         }
     }
@@ -1343,6 +1343,21 @@ window.addEventListener("DOMContentLoaded", function() {
             removeMouseListeners();
         }
     
+    }, false);
+    
+    var touchDown = false;
+    
+    document.addEventListener("touchmove", function(event) {
+        player.setTargetX(event.touches[0].pageX);
+        event.preventDefault();
+    }, false);
+    
+    document.addEventListener("touchStart", function(event) {
+        touchDown = true;
+    }, false);
+    
+    document.addEventListener("touchEnd", function(event) {
+        touchDown = false;
     }, false);
     
     function showCredits() {
