@@ -1360,6 +1360,16 @@ window.addEventListener("DOMContentLoaded", function() {
         touchDown = false;
     }, false);
     
+    var lastTap = 0;
+    
+    window.addEventListener("touchend", function(event) {
+        var currentTap = new Date().getTime();
+        var tapLength = currentTap - lastTap;
+        if (tapLength > 0 && tapLength < 500)
+            event.preventDefault();
+        lastTap = currentTap;
+    }, false);
+    
     function showCredits() {
         document.getElementById("start").style.visibility = "hidden";
         document.getElementById("credits").style.visibility = "visible";
