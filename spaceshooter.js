@@ -1384,7 +1384,7 @@ window.addEventListener("DOMContentLoaded", function() {
         if (tapLength > 0 && tapLength < 500)
             event.preventDefault();
         lastTap = currentTap;
-    }, false);
+    }, true);
     
     function showCredits() {
         document.getElementById("start").style.visibility = "hidden";
@@ -1400,8 +1400,14 @@ window.addEventListener("DOMContentLoaded", function() {
         window.addEventListener("keydown", startHandler, false);
     }
     
-    document.getElementById("credits_link").addEventListener("click", showCredits, false);    
-    document.getElementById("credits").addEventListener("click", returnToStart, false);
+    document.getElementById("credits_link").addEventListener("click", showCredits, false);
+    
+    var credits = document.getElementById("credits");
+    
+    credits.addEventListener("click", function(event) {
+        if (event.target == credits)
+            returnToStart();
+    }, false);
     
     window.addEventListener("load", function() {
         document.getElementById("start").style.visibility = "visible";
