@@ -1356,11 +1356,11 @@ window.addEventListener("DOMContentLoaded", function() {
     
     function touchStartHandler() {
         touchDown = true;
+        player.setTargetX(event.touches[0].pageX);
     }
     
     function touchEndHandler() {
         touchDown = false;
-        player.setTargetX(event.touches[0].pageX);
         player.shoot();
     }
     
