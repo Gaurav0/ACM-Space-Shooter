@@ -325,6 +325,7 @@ window.addEventListener("DOMContentLoaded", function() {
         document.addEventListener("timer", keyHandler, false);
         if (mouseEnabled)
             addMouseListeners();
+        addTouchListeners();
         
         var _draw = this.draw;
         this.draw = function() {
@@ -395,6 +396,7 @@ window.addEventListener("DOMContentLoaded", function() {
             window.removeEventListener("keydown", keyUpHandler, false);
             document.removeEventListener("timer", keyHandler, false);
             removeMouseListeners();
+            removeTouchListeners();
             document.removeEventListener("timer", moveStarshipToTargetX, false);
             mouseDown = false;
             keyStatus = {};
@@ -1347,18 +1349,32 @@ window.addEventListener("DOMContentLoaded", function() {
     
     var touchDown = false;
     
-    window.addEventListener("touchmove", function(event) {
+    function touchMoveHandler() {
         player.setTargetX(event.touches[0].pageX);
         event.preventDefault();
-    }, false);
+    }
     
-    window.addEventListener("touchstart", function(event) {
+    function touchStartHandler() {
         touchDown = true;
-    }, false);
+    }
     
-    window.addEventListener("touchend", function(event) {
+    function touchEndHandler() {
         touchDown = false;
-    }, false);
+        player.setTargetX(event.touches[0].pageX);
+        player.shoot();
+    }
+    
+    function addTouchListeners() {
+        window.addEventListener("touchmove", touchMoveHandler, false);    
+        window.addEventListener("touchstart", touchStartHandler, false);    
+        window.addEventListener("touchend", touchEndHandler, false);
+    }
+    
+    function removeTouchListeners() {
+        window.removeEventListener("touchmove", touchMoveHandler, false);    
+        window.removeEventListener("touchstart", touchStartHandler, false);    
+        window.removeEventListener("touchend", touchEndHandler, false);
+    }
     
     var lastTap = 0;
     
