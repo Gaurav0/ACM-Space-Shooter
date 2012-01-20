@@ -1381,9 +1381,11 @@ window.addEventListener("DOMContentLoaded", function() {
     window.addEventListener("touchend", function(event) {
         var currentTap = new Date().getTime();
         var tapLength = currentTap - lastTap;
-        if (tapLength > 0 && tapLength < 500)
+        if (tapLength > 0 && tapLength < 500) {
+            lastTap = 0;
             event.preventDefault();
-        lastTap = currentTap;
+        } else
+            lastTap = currentTap;
     }, true);
     
     function showCredits() {
