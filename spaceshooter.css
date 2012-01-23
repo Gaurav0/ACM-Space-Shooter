@@ -1,3 +1,14 @@
+@font-face {
+    font-family: 'Shear15';
+    src: url('fonts/shear15-webfont.eot');
+    src: url('fonts/shear15-webfont.eot?#iefix') format('embedded-opentype'),
+         url('fonts/shear15-webfont.woff') format('woff'),
+         url('fonts/shear15-webfont.ttf') format('truetype'),
+         url('fonts/shear15-webfont.svg#Shear15ARegular') format('svg');
+    font-weight: bold;
+    font-style: normal;
+}
+
 #field {
     background: url(images/nebula3a.jpg);
     position: absolute;
@@ -40,7 +51,7 @@
     width: 100px;
     text-align: right;
     color: #ffff00;
-    font: 22px arial, sans-serif;
+    font: 22px Arial, sans-serif;
 }
 
 #level {
@@ -50,7 +61,7 @@
     width: 100px;
     text-align: right;
     color: #ffff00;
-    font: 22px arial, sans-serif;
+    font: 22px Arial, sans-serif;
 }
 
 #combo {
@@ -60,17 +71,18 @@
     width: 200px;
     text-align: center;
     color: #ffff00;
-    font: 22px arial, sans-serif;
+    font: 22px Arial, sans-serif;
 }
 
 .overlay {
     position: absolute;
-    font: 50px bold arial, sans-serif;
+    font-family: 'Shear15', Arial, sans-serif;
+    font-weight: bold;
+    font-size: 50px;
+    line-height: 62px;
     text-align: center;
     padding-top: 12px;
-    padding-left: 20px;
     color: #ffff00;
-    letter-spacing: 20px;
     text-transform: uppercase;
     visibility: hidden;
     border-style: solid;
@@ -84,7 +96,7 @@
     top: 140px;
     left: 105px;
     width: 400px;
-    height: 340px;
+    height: 350px;
 }
 
 #end {
@@ -105,10 +117,11 @@
     top: 70px;
     left: 105px;
     width: 400px;
-    height: 480px;
+    height: 500px;
     padding-right: 10px;
-    font: 14px bold arial, sans-serif;
+    font: 14px bold Arial, sans-serif;
     letter-spacing: 0;
+    line-height: normal;
 }
 
 .underneath {

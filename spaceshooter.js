@@ -1407,7 +1407,7 @@ window.addEventListener("DOMContentLoaded", function() {
     var credits = document.getElementById("credits");
     
     credits.addEventListener("click", function(event) {
-        if (event.target == credits)
+        if (event.target.tagName != "A")
             returnToStart();
     }, false);
     
