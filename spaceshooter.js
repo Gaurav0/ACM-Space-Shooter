@@ -125,8 +125,8 @@ window.addEventListener("DOMContentLoaded", function() {
         
         var _remove = this.remove;
         this.remove = function() {
-            _remove.call(this);
             document.removeEventListener("timer", this.moveSprite, false);
+            _remove.call(this);
         };
         
         var sprite = this;
@@ -403,7 +403,7 @@ window.addEventListener("DOMContentLoaded", function() {
             music.pause();
             this.remove();
             new Explosion(this);
-            document.getElementById("life" + Starship.num_lives).style.display = "none";
+            document.getElementById("life" + Starship.num_lives).style.visibility = "hidden";
             if (Starship.num_lives > 0) {
                 delay = LIFE_DELAY;
                 document.addEventListener("timer", nextLife, false);
@@ -1038,6 +1038,10 @@ window.addEventListener("DOMContentLoaded", function() {
                 this.sprites.splice(i, 1);
         };
         
+        this.length = function() {
+            return this.sprites.length;
+        };
+        
         this.iterator = function() {
             return new (function(sprites) {
                 this.sprites = sprites;
@@ -1101,8 +1105,6 @@ window.addEventListener("DOMContentLoaded", function() {
             div.textContent = "+" + this.combo;
         }
     }
-
-
     
     Timer.FPS = 24;
     function Timer() {
@@ -1126,6 +1128,10 @@ window.addEventListener("DOMContentLoaded", function() {
             music.play();
             this.dispatch();
         };
+        
+        this.stop = function() {
+            this.paused = true;
+        }
         
         var timer = this;
         this.dispatch = function() {
@@ -1182,7 +1188,6 @@ window.addEventListener("DOMContentLoaded", function() {
                 new EnemyShip();
         }
     }
-    document.addEventListener("timer", generateEnemies, false);
     
     var loop = document.getElementById("loop");
     // Fix for Firefox not looping audio:
@@ -1203,6 +1208,7 @@ window.addEventListener("DOMContentLoaded", function() {
         player.draw();
         music.play();
         window.addEventListener("keydown", pauseHandler, false);
+        document.addEventListener("timer", generateEnemies, false);
         gameTimer.dispatch();
     }
         
@@ -1415,6 +1421,33 @@ window.addEventListener("DOMContentLoaded", function() {
         document.getElementById("start").style.visibility = "visible";
         document.getElementById("begin").addEventListener("click", beginGame, false);
         window.addEventListener("keydown", startHandler, false);
+    }, false);
+    
+    document.getElementById("restart").addEventListener("click", function() {
+        document.getElementById("end").style.visibility = "hidden";
+        while (spriteList.length() > 0) {
+            var iterator = spriteList.iterator();
+            while (iterator.hasNext())
+                iterator.next().remove();
+        }
+        ctx.clearRect(0, 0, c.width, c.height);
+        spriteList = new SpriteList();
+        gameTimer.stop();
+        gameScore = new Score();
+        gameScore.update();
+        gameScore.updateLevel();
+        gameCombo = new Combo();
+        gameCombo.update();
+        Starship.num_lives = MAX_LIVES;
+        var lives = document.querySelectorAll("#lives img");
+        for (var i = 0; i < lives.length; ++i)
+            lives[i].style.visibility = "visible";
+        ticks = 1;
+        player = new Starship();
+        player.draw();
+        music.play();
+        window.addEventListener("keydown", pauseHandler, false);
+        gameTimer.paused = false;
     }, false);
 
 }, false);
