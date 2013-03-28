@@ -184,8 +184,10 @@ section h1 {
 }
 
 .FlattrButton {
-    display: none;
     position: absolute;
-    top: 10px;
     right: 10px;
+    bottom: 10px;
+    width: 228px;
+    height: 130px;
+    z-index: -1;
 }
